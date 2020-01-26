@@ -10,7 +10,16 @@ namespace Rhilip\Bencode;
 
 /**
  * Class Bencode
+ *
+ * Convert Map:
+ *  - Dictionary (starts with d, ends with e, with key sort)
+ *  - List (starts with l, ends with e
+ *  - Integer (starts with i, ends with e
+ *  - String (starts with number denoting number of characters followed by : and then the string)
+ *
  * @package Rhilip\Bencode
+ * @author Rhilip
+ * @license MIT
  *
  * @see https://en.wikipedia.org/wiki/Bencode
  * @see https://wiki.theory.org/index.php/BitTorrentSpecification
@@ -18,15 +27,12 @@ namespace Rhilip\Bencode;
 class Bencode
 {
     /**
-     * Decodes a BEncoded string to the following values:
-     * - Dictionary (starts with d, ends with e)
-     * - List (starts with l, ends with e
-     * - Integer (starts with i, ends with e
-     * - String (starts with number denoting number of characters followed by : and then the string)
+     * Decode bencoded data from string
      *
      * @param string $data
      * @param int $pos
      * @return mixed
+     * @throws ParseErrorException
      */
     public static function decode($data, &$pos = 0)
     {
@@ -88,9 +94,9 @@ class Bencode
     }
 
     /**
+     * Encode arbitrary data to bencode string
      *
-     *
-     * @param array|int|string $data
+     * @param mixed $data
      * @return string
      */
     public static function encode($data)
@@ -128,7 +134,7 @@ class Bencode
     }
 
     /**
-     * Given a path to a file, decode the contents of it
+     * Load data from bencoded file
      *
      * @param string $path
      * @return mixed
@@ -140,7 +146,7 @@ class Bencode
     }
 
     /**
-     * Given a path for a file, encode the contents of it
+     * Dump data to bencoded file
      *
      * @param string $path
      * @param $data
