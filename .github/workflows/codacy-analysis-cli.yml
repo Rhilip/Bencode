@@ -1,13 +1,32 @@
-name: codacy-analysis-cli
+name: covered-cli
 
 on: ["push"]
 
 jobs:
-  codacy-analysis-cli:
+  covered-cli:
     runs-on: ubuntu-latest
-    name: codacy-analysis-cli
+    name: covered-cli
     steps:
       - uses: actions/checkout@master
+
+      - name: Get yarn cache
+        id: composer-cache
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+      
+      - name: Composer install
+        run: composer install --no-interaction --prefer-source --dev
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit --coverage-clover 'clover.xml' tests/
+       
       - name: Run codacy-analysis-cli
         uses: mrfyda/codacy-analysis-cli-action@master
         with:
