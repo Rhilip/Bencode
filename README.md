@@ -1,4 +1,6 @@
 # PHP Bencode Library
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FRhilip%2FBencode.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FRhilip%2FBencode?ref=badge_shield)
+
 
 [Bencode](https://en.wikipedia.org/wiki/Bencode) is the encoding used by the peer-to-peer file sharing system
 [BitTorrent](https://opensource.org/licenses/MIT) for storing and transmitting loosely structured data.
@@ -47,3 +49,5 @@ try {
 ## License
 
 The library is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FRhilip%2FBencode.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FRhilip%2FBencode?ref=badge_large)
