@@ -106,8 +106,8 @@ class Bencode
      */
     private static function checkInteger($value)
     {
-        $int = intval($value);
-        if (strval($int) !== $value) {
+        $int = (int)$value;
+        if ((string)$int !== $value) {
             throw new ParseErrorException('Invalid integer format or integer overflow: ' . $value);
         }
         return $int;
@@ -140,7 +140,7 @@ class Bencode
                 $return .= 'd';
                 ksort($data, SORT_STRING);
                 foreach ($data as $key => $value) {
-                    $return .= self::encode(strval($key));
+                    $return .= self::encode((string)$key);
                     $return .= self::encode($value);
                 }
             }
