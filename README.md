@@ -1,4 +1,5 @@
 # PHP Bencode Library
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/14bb9525a5a343079e45d9501dac1b4c)](https://app.codacy.com/manual/rhilipruan/Bencode?utm_source=github.com&utm_medium=referral&utm_content=Rhilip/Bencode&utm_campaign=Badge_Grade_Dashboard)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FRhilip%2FBencode.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FRhilip%2FBencode?ref=badge_shield)
 
 
