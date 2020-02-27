@@ -2,21 +2,19 @@ name: covered-cli
 
 on: ["push"]
 
+env:
+  CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+
 jobs:
   covered-cli:
     runs-on: ubuntu-latest
     name: covered-cli
     steps:
       - uses: actions/checkout@master
-
-      - name: Get yarn cache
-        id: composer-cache
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
       - name: Cache dependencies
         uses: actions/cache@v1
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
+          path: ${{ github.workspace }}/vendor
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: |
             ${{ runner.os }}-composer-
@@ -26,8 +24,8 @@ jobs:
 
       - name: Run PHPUnit
         run: vendor/bin/phpunit --coverage-clover 'clover.xml' tests/
-       
+
       - name: Run codacy-analysis-cli
-        uses: mrfyda/codacy-analysis-cli-action@master
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        run: |
+          curl -LSs "$(curl -LSs https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets | map({name, browser_download_url} | select(.name | endswith(".jar"))) | .[0].browser_download_url')" -o codacy-coverage-reporter-assembly.jar
+          java -jar codacy-coverage-reporter-assembly.jar report -l php -r clover.xml
