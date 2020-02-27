@@ -7,9 +7,9 @@
  */
 
 use Rhilip\Bencode\Bencode;
-use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class EncodeTest extends PHPUnit_Framework_TestCase
+class EncodeTest extends TestCase
 {
 
     /**
@@ -47,6 +47,25 @@ class EncodeTest extends PHPUnit_Framework_TestCase
 
         // scalars converted to string
         $this->assertEquals('6:3.1416', Bencode::encode(3.1416));
+
+        // number in string type
+        $this->assertEquals('12:123456789012', Bencode::encode('123456789012'));
+    }
+
+    /**
+     * Boolean will convert silently to string since boolean and NULL is not valid Bencode type,
+     * mapped as :
+     *  - true  -> "1"
+     *  - false -> ""  (like empty string)
+     *  - null  -> ""  (like empty string)
+     *
+     * @group string
+     */
+    public function testEncodeBooleanAndNull()
+    {
+        $this->assertEquals('1:1', Bencode::encode(true));
+        $this->assertEquals('0:', Bencode::encode(false));
+        $this->assertEquals('0:', Bencode::encode(null));
     }
 
     /**

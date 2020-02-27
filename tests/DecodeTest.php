@@ -7,10 +7,10 @@
  */
 
 use Rhilip\Bencode\Bencode;
-use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Rhilip\Bencode\ParseErrorException;
 
-class DecodeTest extends PHPUnit_Framework_TestCase
+class DecodeTest extends TestCase
 {
     /**
      * @group integer
@@ -209,12 +209,13 @@ class DecodeTest extends PHPUnit_Framework_TestCase
      *
      * @group dictionary
      */
-    public function testDecodeDictionarySorted() {
+    public function testDecodeDictionarySorted()
+    {
         //  d3:aaa1:b3:ccc1:de
-        $this->assertEquals(['aaa' => 'b','ccc' => 'd'], Bencode::decode('d3:ccc1:d3:aaa1:be'));
+        $this->assertEquals(['aaa' => 'b', 'ccc' => 'd'], Bencode::decode('d3:ccc1:d3:aaa1:be'));
 
         // d1:11:a2:111:b1:21:c2:221:de
-        $this->assertEquals([1 => 'a', 11 => 'b', 2 => 'c', 22 => 'd'],  Bencode::decode('d1:11:a1:21:c2:111:b2:221:de'));
+        $this->assertEquals([1 => 'a', 11 => 'b', 2 => 'c', 22 => 'd'], Bencode::decode('d1:11:a1:21:c2:111:b2:221:de'));
     }
 
     /**
@@ -238,6 +239,30 @@ class DecodeTest extends PHPUnit_Framework_TestCase
 
         Bencode::decode('d1:a1:b1:a1:de');
     }
+
+    public function testDecodeTorrent()
+    {
+        $bencode = 'd8:announce39:http://torrent.foobar.baz:9374/announce13:announce-listll39:http://torrent.foobar.baz:9374/announceel44:http://ipv6.torrent.foobar.baz:9374/announceee7:comment31:My torrent comment goes here :)13:creation datei1382003607e4:infod6:lengthi925892608e4:name13:some-file.boo12:piece lengthi524288e6:pieces0:ee';
+
+        $torrent = array(
+            'announce' => 'http://torrent.foobar.baz:9374/announce',
+            'announce-list' => array(
+                array('http://torrent.foobar.baz:9374/announce'),
+                array('http://ipv6.torrent.foobar.baz:9374/announce'),
+            ),
+            'comment' => 'My torrent comment goes here :)',
+            'creation date' => 1382003607,
+            'info' => array(
+                'length' => 925892608,
+                'name' => 'some-file.boo',
+                'piece length' => 524288,
+                'pieces' => '',
+            ),
+        );
+
+        $this->assertEquals($torrent, Bencode::decode($bencode));
+    }
+
 
     /**
      * @group all
