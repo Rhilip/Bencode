@@ -1,6 +1,6 @@
 name: covered-cli
 
-on: ["push"]
+on: [ "push" ]
 
 env:
   CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
@@ -11,14 +11,16 @@ jobs:
     name: covered-cli
     steps:
       - uses: actions/checkout@master
-      - name: Cache dependencies
-        uses: actions/cache@v1
+      - name: Get Composer Cache Directory
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - uses: actions/cache@v2
         with:
-          path: ${{ github.workspace }}/vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
-      
+
       - name: Composer install
         run: composer install --no-interaction --prefer-source --dev
 
