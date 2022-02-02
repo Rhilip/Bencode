@@ -8,6 +8,25 @@
 
 namespace Rhilip\Bencode;
 
+if (!function_exists('array_is_list')) {
+    function array_is_list(array $array)
+    {
+        if ([] === $array || $array === array_values($array)) {
+            return true;
+        }
+
+        $nextKey = -1;
+
+        foreach ($array as $k => $v) {
+            if ($k !== ++$nextKey) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
 /**
  * Class Bencode
  *
@@ -123,15 +142,7 @@ class Bencode
     {
         if (is_array($data)) {
             $return = '';
-            $check = -1;
-            $list = true;
-            foreach ($data as $key => $value) {
-                if ($key !== ++$check) {
-                    $list = false;
-                    break;
-                }
-            }
-            if ($list) {
+            if (array_is_list($data)) {
                 $return .= 'l';
                 foreach ($data as $value) {
                     $return .= self::encode($value);
