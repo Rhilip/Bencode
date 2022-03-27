@@ -332,7 +332,7 @@ class TorrentFile
                 if (\count($fileTree) !== 1) {
                     $this->cache['filemode'] = self::FILEMODE_MULTI;
                 } else {
-                    $file = $fileTree[array_key_first($fileTree)];
+                    $file = reset($fileTree);
 
                     if (isset($file['']['length'])) {
                         $this->cache['filemode'] = self::FILEMODE_SINGLE;
@@ -505,8 +505,8 @@ class TorrentFile
                     $size = $this->getInfoField('length');
                     $files[] = ['path' => $this->getName(), 'size' => $size];
                 } else {
-                    $files = self::checkTorrentDict($info, 'files', 'array');
-                    foreach ($files as $file) {
+                    $torrentFiles = self::checkTorrentDict($info, 'files', 'array');
+                    foreach ($torrentFiles as $file) {
                         $length = self::checkTorrentDict($file, 'length', 'integer');
                         $path_key = isset($file['path.utf-8']) ? 'path.utf-8' : 'path';
                         $paths = self::checkTorrentDict($file, $path_key, 'list');
