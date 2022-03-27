@@ -565,7 +565,7 @@ class TorrentFile
                 };
 
                 $loopMerkleTree($fileTree);
-                $this->cache['filetree'] = $fileTree;
+                $this->cache['filetree'] = $this->fixFileTree($fileTree);
             }
 
             $this->cache['parsed'] = ['total_size' => $size, 'files' => $files];
@@ -613,14 +613,18 @@ class TorrentFile
             $preferList = array_column($this->getFileList(), "size", "path");
 
             $fileTree = self::generateFileTreeFromList($preferList);
-            if ($this->getFileMode() === self::FILEMODE_MULTI) {
-                $torrentName = $this->getName();
-                $fileTree = [$torrentName => $fileTree];
-            }
-            $this->cache['filetree'] = $fileTree;
+            $this->cache['filetree'] = $this->fixFileTree($fileTree);
         }
 
         return $this->cache['filetree'];
+    }
+
+    protected function fixFileTree($fileTree) {
+        if ($this->getFileMode() === self::FILEMODE_MULTI) {
+            $torrentName = $this->getName();
+            $fileTree = [$torrentName => $fileTree];
+        }
+        return $fileTree;
     }
 
     protected static function generateFileTreeFromList($array, $delimiter = '/')
