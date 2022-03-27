@@ -661,9 +661,4 @@ class TorrentFile
         $this->cache = [];
         return $this;
     }
-
-    public function getCache()
-    {
-        return $this->cache;
-    }
 }
