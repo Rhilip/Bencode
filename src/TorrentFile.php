@@ -220,12 +220,12 @@ class TorrentFile
     // Nodes, see: https://www.bittorrent.org/beps/bep_0005.html
     public function getNodes()
     {
-        return $this->getRootField('httpseeds');
+        return $this->getRootField('nodes');
     }
 
     public function setNodes($value)
     {
-        return $this->setRootField('httpseeds', $value);
+        return $this->setRootField('nodes', $value);
     }
 
     // UrlList, see: https://www.bittorrent.org/beps/bep_0019.html
