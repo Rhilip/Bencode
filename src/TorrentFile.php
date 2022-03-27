@@ -280,7 +280,6 @@ class TorrentFile
      * x_cross_seed is added by PyroCor (@see https://github.com/pyroscope/pyrocore)
      * unique is added by xseed (@see https://whatbox.ca/wiki/xseed)
      *
-     * @return bool
      */
     public function cleanInfoFields($allowedKeys = [
         // Other not standard keys
@@ -463,6 +462,9 @@ class TorrentFile
         return $this->getInfoField('private') === 1;
     }
 
+    /**
+     * @param bool $private
+     */
     public function setPrivate($private)
     {
         return $private ? $this->setInfoField('private', 1) : $this->unsetInfoField('private');
@@ -473,8 +475,6 @@ class TorrentFile
      * our torrent file when we go to store it in the DB or serve it up to the user (with the
      * expectation that we'll be calling at least setAnnounceUrl(...) when a user asks for a valid
      * torrent file).
-     *
-     * @return bool flag to indicate if we altered the info dictionary
      */
     public function clean()
     {
@@ -491,7 +491,7 @@ class TorrentFile
      * 6. other method that we used to get size, filelist or filetree,
      * 
      */
-    protected function parseData()
+    public function parse()
     {
         if (!isset($this->cache['parsed'])) {
             $size = 0;
@@ -580,7 +580,7 @@ class TorrentFile
 
     public function getSize()
     {
-        return $this->parseData()['total_size'];
+        return $this->parse()['total_size'];
     }
 
     public function getFileCount()
@@ -598,7 +598,7 @@ class TorrentFile
      */
     public function getFileList()
     {
-        return $this->parseData()['files'];
+        return $this->parse()['files'];
     }
 
     /**
