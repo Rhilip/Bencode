@@ -2,6 +2,19 @@
 
 namespace Rhilip\Bencode;
 
+if (!function_exists('str_contains')) {
+    /**
+     * polyfill of str_contains for PHP < 8.0.0
+     * 
+     * @param string $haystack
+     * @param string $needle
+     */
+    function str_contains($haystack, $needle)
+    {
+        return empty($needle) || strpos($haystack, $needle) !== false;
+    }
+}
+
 /**
  * Additionally, as this is for torrent files, we can make the following assumptions
  * and requirements:
@@ -624,7 +637,8 @@ class TorrentFile
         return $this->cache['filetree'];
     }
 
-    protected function fixFileTree($fileTree) {
+    protected function fixFileTree($fileTree)
+    {
         if ($this->getFileMode() === self::FILEMODE_MULTI) {
             $torrentName = $this->getName();
             $fileTree = [$torrentName => $fileTree];
