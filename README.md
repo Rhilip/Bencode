@@ -18,6 +18,7 @@ composer require rhilip/bencode
 ```
 
 if you don't use `Rhilip\Bencode\TorrentFile` class, you can specific version to `1.x.x`
+
 ```shell script
 composer require rhilip/bencode:1.2.0
 ```
@@ -140,6 +141,8 @@ $torrent->getInfoHashV1ForAnnounce();  // return the v1 info-hash in announce ( 
 $torrent->getInfoHashV2ForAnnounce();  // return the v2 (truncated) info-hash in announce
 $torrent->getInfoHashsForAnnnounce();  // same as getInfoHashs() but in announce
 
+$torrent->getPieceLength();  // int
+
 try {
     $torrent->setName($name);
 } catch(\InvalidArgumentException $e) {
@@ -156,16 +159,24 @@ $torrent->setPrivate(true);
 // Work with torrent, it will try to parse torrent ( cost time )
 $torrent->setParseValidator(function ($filename, $path) {
     /**
-     * Before parse torrent, you can set a validator 
-     * to test if filename or path is valid,
-     * And break parse process by any throw Exception
-     */ 
+     * Before parse torrent ( call getSize, getFileCount, getFileList, getFileTree method ),
+     * you can set a validator to test if filename or path is valid,
+     * And break parse process by any throw Exception.
+     *
+     * Note: Since we get $filename by use end($path),
+     * you should be care about the the internal pointer of $path,
+     * It means `current($path) === $filename` and `next($path) === false`
+     */
     print_r([$filename, $path]);
     if (str_contains($filename, 'F**k')) {
         throw new ParseException('Not allowed filename in torrent');
     }
 });
 
+/**
+ * Note: Since we prefer to parse `file tree` in info dict in v2 or hybrid torrent,
+ * The padding file will not count in size, fileCount, fileList and fileTree.
+ */
 $size = $torrent->getSize();
 $count = $torrent->getFileCount();
 $fileList = $torrent->getFileList();

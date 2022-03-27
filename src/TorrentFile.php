@@ -415,6 +415,11 @@ class TorrentFile
         ];
     }
 
+    public function getPieceLength()
+    {
+        return $this->getInfoField('piece length');
+    }
+
     public function getName()
     {
         return $this->getInfoField('name.utf8', $this->getInfoField('name'));
@@ -526,8 +531,8 @@ class TorrentFile
                     }
                 }
             } else {
+                $picesLength = $this->getPieceLength();
                 $fileTree = self::checkTorrentDict($info, 'file tree', 'array');
-                $picesLength = self::checkTorrentDict($info, 'piece length', 'integer');
                 $pieceLayers = self::checkTorrentDict($this->data, 'piece layers');
 
                 $loopMerkleTree = function (&$merkleTree, &$paths = []) use (&$files, &$size, $pieceLayers, $parseValidator, $picesLength, &$loopMerkleTree) {
