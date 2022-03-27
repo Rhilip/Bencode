@@ -73,14 +73,14 @@ require '/path/to/vendor/autoload.php';
 use Rhilip\Bencode\TorrentFile;
 use Rhilip\Bencode\ParseException;
 
-// Defined Const
+// 0. Defined Const
 print(TorrentFile::PROTOCOL_V1); // v1
 print(TorrentFile::PROTOCOL_V2); // v2
 print(TorrentFile::PROTOCOL_HYBRID); // hybrid
 print(TorrentFile::FILEMODE_SINGLE); // single
 print(TorrentFile::FILEMODE_MULTI); // multi
 
-// Load Torrent and get instance
+// 1. Load Torrent and get instance
 try {
     $torrent = TorrentFile::load($path);
     $torrent = TorrentFile::loadFromString($string);
@@ -88,11 +88,11 @@ try {
     // do something
 }
 
-// Save Torrent to path or string (for echo)
+// 2. Save Torrent to path or string (for echo)
 $dumpStatus = $torrent->dump($path);
 print($torrent->dumpToString());
 
-// Work with Root Fields
+// 3. Work with Root Fields
 $torrent->getRootData();   // $root;
 $rootField = $torrent->getRootField($field, ?$default);   // $root[$field] ?? $default;
 $torrent->setRootField($field, $value);  // $root[$field] = $value;
@@ -123,7 +123,7 @@ $nodes = $torrent->getNodes();
 $torrent->setUrlList(['udp://example.com/seed']);
 $urlList = $torrent->getUrlList();
 
-// Work with Info Field
+// 4. Work with Info Field
 $torrent->getInfoData();   // $root['info'];
 $infoField = $torrent->getInfoField($field, ?$default);  // $info[$field] ?? $default;
 $torrent->setInfoField($field, $value); // $info[$field] = $value;
@@ -156,7 +156,7 @@ $source = $torrent->getSource();
 $private = $torrent->isPrivate();  // true or false
 $torrent->setPrivate(true);
 
-// Work with torrent, it will try to parse torrent ( cost time )
+// 5. Work with torrent, it will try to parse torrent ( cost time )
 $torrent->setParseValidator(function ($filename, $path) {
     /**
      * Before parse torrent ( call getSize, getFileCount, getFileList, getFileTree method ),
@@ -174,6 +174,12 @@ $torrent->setParseValidator(function ($filename, $path) {
 });
 
 /**
+ * parse method will automatically called when use getSize, getFileCount, getFileList, getFileTree method,
+ * However you can also call parse method manually.
+ */ 
+$torrent->parse();  // ['total_size' => $size, 'files' => $fileList]
+
+/**
  * Note: Since we prefer to parse `file tree` in info dict in v2 or hybrid torrent,
  * The padding file will not count in size, fileCount, fileList and fileTree.
  */
@@ -182,8 +188,19 @@ $count = $torrent->getFileCount();
 $fileList = $torrent->getFileList();
 $fileTree = $torrent->getFileTree();
 
-// Other method
+// 6. Other method
 $torrent->cleanCache();
+
+// Note 1: clean,set,unset method are chaining
+$torrent
+  ->clean()
+  ->setAnnounce('https://example.com/announce')
+  ->setAnnounceList([
+    ['https://example.com/announce'],
+    ['https://example1.com/announce']
+  ])
+  ->setSouce('example.com')
+  ->setPrivate(true);
 ```
 
 ## License
