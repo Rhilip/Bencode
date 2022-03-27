@@ -1,6 +1,6 @@
 <?php
 
-include_once 'traits\TorrentFileCommonTrait.php';
+include_once 'traits/TorrentFileCommonTrait.php';
 
 use Rhilip\Bencode\TorrentFile;
 use PHPUnit\Framework\TestCase;
