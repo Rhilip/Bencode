@@ -81,8 +81,6 @@ class TorrentFile
 
         // Store base data
         $this->data = $data;
-
-        // TODO check spec key by it's type
     }
 
     /**
