@@ -158,17 +158,13 @@ $private = $torrent->isPrivate();  // true or false
 $torrent->setPrivate(true);
 
 // 5. Work with torrent, it will try to parse torrent ( cost time )
-$torrent->setParseValidator(function ($filename, $path) {
+$torrent->setParseValidator(function ($filename, $paths) {
     /**
      * Before parse torrent ( call getSize, getFileCount, getFileList, getFileTree method ),
-     * you can set a validator to test if filename or path is valid,
+     * you can set a validator to test if filename or paths is valid,
      * And break parse process by any throw Exception.
-     *
-     * Note: Since we get $filename by use end($path),
-     * you should be care about the the internal pointer of $path,
-     * It means `current($path) === $filename` and `next($path) === false`
      */
-    print_r([$filename, $path]);
+    print_r([$filename, $paths]);
     if (str_contains($filename, 'F**k')) {
         throw new ParseException('Not allowed filename in torrent');
     }
@@ -178,7 +174,7 @@ $torrent->setParseValidator(function ($filename, $path) {
  * parse method will automatically called when use getSize, getFileCount, getFileList, getFileTree method,
  * However you can also call parse method manually.
  */ 
-$torrent->parse();  // ['total_size' => $size, 'files' => $fileList]
+$torrent->parse();  // ['total_size' => $size, 'files' => $fileList, 'fileTree' => $fileTree]
 
 /**
  * Note: Since we prefer to parse `file tree` in info dict in v2 or hybrid torrent,

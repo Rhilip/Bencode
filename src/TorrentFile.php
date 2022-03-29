@@ -5,7 +5,7 @@ namespace Rhilip\Bencode;
 if (!function_exists('str_contains')) {
     /**
      * polyfill of str_contains for PHP < 8.0.0
-     * 
+     *
      * @param string $haystack
      * @param string $needle
      */
@@ -28,12 +28,12 @@ if (!function_exists('str_contains')) {
 class TorrentFile
 {
     // BitTorrent version enumerator
-    const PROTOCOL_V1 = 'v1';  // The original BitTorrent version, using SHA-1 hashes
-    const PROTOCOL_V2 = 'v2';  // Version 2 of the BitTorrent protocol, using SHA-256 hashes
-    const PROTOCOL_HYBRID = 'hybrid';  // Torrent with both v1 and v2 support 
+    public const PROTOCOL_V1 = 'v1';  // The original BitTorrent version, using SHA-1 hashes
+    public const PROTOCOL_V2 = 'v2';  // Version 2 of the BitTorrent protocol, using SHA-256 hashes
+    public const PROTOCOL_HYBRID = 'hybrid';  // Torrent with both v1 and v2 support
 
-    const FILEMODE_SINGLE = 'single';
-    const FILEMODE_MULTI = 'multi';
+    public const FILEMODE_SINGLE = 'single';
+    public const FILEMODE_MULTI = 'multi';
 
     // store torrent dict
     private $data;
@@ -70,8 +70,8 @@ class TorrentFile
     }
 
     /**
-     * Use as Singleton, so user can only call TorrentFile::load() or 
-     * TorrentFile::loadFromString() method to create instance. 
+     * Use as Singleton, so user can only call TorrentFile::load() or
+     * TorrentFile::loadFromString() method to create instance.
      */
     protected function __construct($data)
     {
@@ -86,7 +86,7 @@ class TorrentFile
 
     /**
      * 1. load and dump method for torrent file
-     * 
+     *
      * - Only load and loadFromString function are static in whole class
      * - dump and dumpToString are just wrapper of Bencode
      */
@@ -143,7 +143,7 @@ class TorrentFile
      * store the smallest encoded string within the database and cuts down on potential waste.
      */
     public function cleanRootFields($allowedKeys = [
-        'comment', 'created by', 'creation date' // Other keys 
+        'comment', 'created by', 'creation date' // Other keys
     ])
     {
         $allowedKeys = array_merge([
@@ -357,7 +357,7 @@ class TorrentFile
 
     /**
      * Get V1 info hash if V1 metadata is present or null if not.
-     * 
+     *
      * note:
      *  - getInfoHashV1(true) is same as pack("H*", sha1($infohashString))
      *  - getInfoHashv1(false) is same as bin2hex(sha1($infohashString, true))
@@ -371,7 +371,7 @@ class TorrentFile
 
     /**
      * Get V2 info hash if V2 metadata is present or null if not.
-     * 
+     *
      * @param bool $binary
      * @throws ParseException
      */
@@ -501,13 +501,14 @@ class TorrentFile
 
     /**
      * 6. other method that we used to get size, filelist or filetree,
-     * 
+     *
      */
     public function parse()
     {
         if (!isset($this->cache['parsed'])) {
             $size = 0;
             $files = [];
+            $fileTree = [];
 
             $info = $this->data['info'];
             $parseValidator = $this->parseValidator;
@@ -521,6 +522,7 @@ class TorrentFile
                 if ($this->getFileMode() === self::FILEMODE_SINGLE) {
                     $size = $this->getInfoField('length');
                     $files[] = ['path' => $this->getName(), 'size' => $size];
+                    $fileTree = [$this->getName() => $size];
                 } else {
                     $torrentFiles = self::checkTorrentDict($info, 'files', 'array');
                     foreach ($torrentFiles as $file) {
@@ -535,19 +537,34 @@ class TorrentFile
                         }
 
                         if ($parseValidator instanceof \Closure) {
-                            call_user_func($parseValidator, end($paths), $paths);
+                            call_user_func($parseValidator, self::arrayEnd($paths), $paths);
                         }
 
                         $size += $length;
                         $files[] = ['path' => implode('/', $paths), 'size' => $length];
+
+                        // Built fileTree
+                        $leafPart = array_pop($paths);
+                        $parentArr = &$fileTree;
+                        foreach ($paths as $path) {
+                            if (!isset($parentArr[$path])) {
+                                $parentArr[$path] = [];
+                            } elseif (!is_array($parentArr[$path])) {
+                                $parentArr[$path] = [];
+                            }
+                            $parentArr = &$parentArr[$path];
+                        }
+                        if (empty($parentArr[$leafPart])) {
+                            $parentArr[$leafPart] = $length;
+                        }
                     }
                 }
             } else {
-                $picesLength = $this->getPieceLength();
+                $pieceLength = $this->getPieceLength();
                 $fileTree = self::checkTorrentDict($info, 'file tree', 'array');
-                $pieceLayers = self::checkTorrentDict($this->data, 'piece layers','array');
+                $pieceLayers = self::checkTorrentDict($this->data, 'piece layers', 'array');
 
-                $loopMerkleTree = function (&$merkleTree, &$paths = []) use (&$files, &$size, $pieceLayers, $parseValidator, $picesLength, &$loopMerkleTree) {
+                $loopMerkleTree = function (&$merkleTree, &$paths = []) use (&$files, &$size, $pieceLayers, $parseValidator, $pieceLength, &$loopMerkleTree) {
                     if (isset($merkleTree[''])) {  // reach file
                         $file = $merkleTree[''];
 
@@ -557,20 +574,20 @@ class TorrentFile
                         }
 
                         $length = self::checkTorrentDict($file, 'length', 'integer');
-                        if ($length > $picesLength) {  // check pieces root of large file is exist in $root['picec layers'] or not
+                        if ($length > $pieceLength) {  // check pieces root of large file is exist in $root['picec layers'] or not
                             if (!array_key_exists($piecesRoot, $pieceLayers)) {
                                 throw new ParseException('Pieces not exist in piece layers.');
                             }
                         }
 
                         if ($parseValidator instanceof \Closure) {
-                            call_user_func($parseValidator, end($paths), $paths);
+                            call_user_func($parseValidator, self::arrayEnd($paths), $paths);
                         }
 
                         $size += $length;
                         $files[] = ['path' => implode('/', $paths), 'size' => $length];
 
-                        $merkleTree = $length;  // rewrite merkleTree to size
+                        $merkleTree = $length;  // rewrite merkleTree to size, it not affect $data['info']['file tree']
                     } else {
                         $parent_path = $paths;  // store parent paths
                         foreach ($merkleTree as $k => &$v) {  // Loop tree
@@ -582,10 +599,19 @@ class TorrentFile
                 };
 
                 $loopMerkleTree($fileTree);
-                $this->cache['filetree'] = $this->fixFileTree($fileTree);
             }
 
-            $this->cache['parsed'] = ['total_size' => $size, 'files' => $files];
+            // Fix fileTree for multi torrent
+            if ($this->getFileMode() === self::FILEMODE_MULTI) {
+                $torrentName = $this->getName();
+                $fileTree = [$torrentName => $fileTree];
+            }
+
+            $this->cache['parsed'] = [
+                'total_size' => $size,
+                'files' => $files,
+                'fileTree' => $fileTree
+            ];
         }
         return $this->cache['parsed'];
     }
@@ -601,12 +627,12 @@ class TorrentFile
     }
 
     /**
-     * Return a list like: 
+     * Return a list like:
      * [
      *   ["path" => "filename1", "size" => 123],   //  123 is file size
      *   ["path" => "directory/filename2", "size" => 2345]
      * ]
-     * 
+     *
      */
     public function getFileList()
     {
@@ -618,7 +644,7 @@ class TorrentFile
      * [
      *     "torrentname" => [
      *         "directory" => [
-     *             "filename2" => 2345 
+     *             "filename2" => 2345
      *         ],
      *         "filename1" => 123
      *    ]
@@ -626,61 +652,17 @@ class TorrentFile
      */
     public function getFileTree()
     {
-        if (!isset($this->cache['filetree'])) {
-            $preferList = array_column($this->getFileList(), "size", "path");
-
-            $fileTree = self::generateFileTreeFromList($preferList);
-            $this->cache['filetree'] = $this->fixFileTree($fileTree);
-        }
-
-        return $this->cache['filetree'];
-    }
-
-    protected function fixFileTree($fileTree)
-    {
-        if ($this->getFileMode() === self::FILEMODE_MULTI) {
-            $torrentName = $this->getName();
-            $fileTree = [$torrentName => $fileTree];
-        }
-        return $fileTree;
-    }
-
-    protected static function generateFileTreeFromList($array, $delimiter = '/')
-    {
-        if (!is_array($array)) {
-            return [];
-        }
-
-        $splitRE = '/' . preg_quote($delimiter, '/') . '/';
-        $returnArr = [];
-        foreach ($array as $key => $val) {
-            // Get parent parts and the current leaf
-            $parts = preg_split($splitRE, $key, -1, PREG_SPLIT_NO_EMPTY);
-            $leafPart = array_pop($parts);
-
-            // Build parent structure
-            // Might be slow for really deep and large structures
-            $parentArr = &$returnArr;
-            foreach ($parts as $part) {
-                if (!isset($parentArr[$part])) {
-                    $parentArr[$part] = [];
-                } elseif (!is_array($parentArr[$part])) {
-                    $parentArr[$part] = [];
-                }
-                $parentArr = &$parentArr[$part];
-            }
-
-            // Add the final part to the structure
-            if (empty($parentArr[$leafPart])) {
-                $parentArr[$leafPart] = $val;
-            }
-        }
-        return $returnArr;
+        return $this->parse()['fileTree'];
     }
 
     public function cleanCache()
     {
         $this->cache = [];
         return $this;
+    }
+
+    // Wrapper end function to avoid change the internal pointer of $path,
+    private static function arrayEnd($array) {
+        return end($array);
     }
 }

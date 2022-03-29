@@ -5,7 +5,7 @@ namespace Rhilip\Bencode;
 if (!function_exists('array_is_list')) {
     /**
      * polyfill of array_key_last for PHP < 8.1.0
-     * 
+     *
      * @param array $array
      */
     function array_is_list($array)
