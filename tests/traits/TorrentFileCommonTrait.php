@@ -1,9 +1,11 @@
 <?php
 
+use Rhilip\Bencode\ParseException;
 use Rhilip\Bencode\TorrentFile;
 
 trait TorrentFileCommonTrait
 {
+    /** @var TorrentFile */
     private $torrent;
 
     protected $announce = 'https://example.com/announce';
@@ -211,5 +213,63 @@ trait TorrentFileCommonTrait
             ? ['tname' => ['dict' => ['file2.dat' => 16777216], 'file1.dat' => 16777216]]
             : ['file1.dat' => 16777216];
         $this->assertEqualsCanonicalizing($fileCount, $this->torrent->getFileTree());
+    }
+
+    public function testConstructWithoutInfo()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Checking Dictionary missing key: ');
+
+        $torrentString = $this->torrent->unsetRootField('info')->dumpToString();
+        TorrentFile::loadFromString($torrentString);
+    }
+
+    public function testConstructWithoutPieceLength()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Checking Dictionary missing key: ');
+
+        $torrentString = $this->torrent->unsetInfoField('piece length')->dumpToString();
+        TorrentFile::loadFromString($torrentString);
+    }
+
+    public function testConstructWithoutName()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Checking Dictionary missing key: ');
+
+        $torrentString = $this->torrent->unsetInfoField('name')->dumpToString();
+        TorrentFile::loadFromString($torrentString);
+    }
+
+    public function testCleanRootFields()
+    {
+        $this->torrent->setRootField('rhilip', 'bencode');
+        $this->assertEquals('bencode', $this->torrent->getRootField('rhilip'));
+
+        $this->torrent->cleanRootFields();
+        $this->assertNull($this->torrent->getRootField('rhilip'));
+    }
+
+    public function testCleanInfoFields()
+    {
+        $this->torrent->setInfoField('rhilip', 'bencode');
+        $this->assertEquals('bencode', $this->torrent->getInfoField('rhilip'));
+
+        $this->torrent->cleanInfoFields();
+        $this->assertNull($this->torrent->getInfoField('rhilip'));
+    }
+
+    public function testCustomParseValidator()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('file1.dat found');
+
+        $this->torrent->setParseValidator(function ($filename, $path) {
+           if (strpos($filename, 'file1.dat') !== false) {
+               throw new ParseException('file1.dat found');
+           }
+        });
+        $this->torrent->parse();
     }
 }

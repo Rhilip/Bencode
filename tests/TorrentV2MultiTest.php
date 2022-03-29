@@ -1,6 +1,7 @@
 <?php
 
 include_once 'traits/TorrentFileCommonTrait.php';
+include_once 'traits/TorrentFileV2Trait.php';
 
 use Rhilip\Bencode\TorrentFile;
 use PHPUnit\Framework\TestCase;
@@ -8,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 class TorrentV2MultiTest extends TestCase
 {
     use TorrentFileCommonTrait;
+    use TorrentFileV2Trait;
 
     protected $protocol = TorrentFile::PROTOCOL_V2;
     protected $fileMode = TorrentFile::FILEMODE_MULTI;

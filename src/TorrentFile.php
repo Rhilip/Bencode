@@ -55,10 +55,13 @@ class TorrentFile
         if (!is_array($dict)) {
             throw new ParseException('Checking non-dictionary value.');
         }
-        $value = $dict[$key];
-        if (!isset($value)) {
+
+        if (!isset($dict[$key])) {
             throw new ParseException("Checking Dictionary missing key: {$key}");
         }
+
+        $value = $dict[$key];
+
         if (!is_null($type)) {
             $isFunction = 'is_' . $type;
             if (function_exists($isFunction) && !$isFunction($value)) {
@@ -66,6 +69,7 @@ class TorrentFile
                 throw new ParseException("Invalid entry type in dictionary, want : {$type}, current: {$valueType}");
             }
         }
+
         return $value;
     }
 
@@ -122,7 +126,7 @@ class TorrentFile
 
     public function getRootField($field, $default = null)
     {
-        return isset($this->data[$field]) ? $this->data[$field] : $default;
+        return $this->data[$field] ?? $default;
     }
 
     public function setRootField($field, $value)
@@ -506,12 +510,20 @@ class TorrentFile
     public function parse()
     {
         if (!isset($this->cache['parsed'])) {
-            $size = 0;
+            $totalSize = 0;
             $files = [];
             $fileTree = [];
 
             $info = $this->data['info'];
             $parseValidator = $this->parseValidator;
+
+            $addFile = function ($paths, $size) use (&$files, &$totalSize, $parseValidator) {
+                if ($parseValidator instanceof \Closure) {
+                    call_user_func($parseValidator, self::arrayEnd($paths), $paths);
+                }
+                $totalSize += $size;
+                $files[] = ['path' => implode('/', $paths), 'size' => $size];
+            };
 
             if ($this->getProtocol() === self::PROTOCOL_V1) {  // Do what we do in protocol v1
                 $pieces = self::checkTorrentDict($info, 'pieces', 'string');
@@ -521,8 +533,10 @@ class TorrentFile
 
                 if ($this->getFileMode() === self::FILEMODE_SINGLE) {
                     $size = $this->getInfoField('length');
-                    $files[] = ['path' => $this->getName(), 'size' => $size];
-                    $fileTree = [$this->getName() => $size];
+                    $name = $this->getName();
+
+                    $addFile([$name], $size);
+                    $fileTree[$name] = $size;
                 } else {
                     $torrentFiles = self::checkTorrentDict($info, 'files', 'array');
                     foreach ($torrentFiles as $file) {
@@ -536,14 +550,9 @@ class TorrentFile
                             }
                         }
 
-                        if ($parseValidator instanceof \Closure) {
-                            call_user_func($parseValidator, self::arrayEnd($paths), $paths);
-                        }
+                        $addFile($paths, $length);
 
-                        $size += $length;
-                        $files[] = ['path' => implode('/', $paths), 'size' => $length];
-
-                        // Built fileTree
+                        // Built fileTree for v1-multi torrent
                         $leafPart = array_pop($paths);
                         $parentArr = &$fileTree;
                         foreach ($paths as $path) {
@@ -564,7 +573,7 @@ class TorrentFile
                 $fileTree = self::checkTorrentDict($info, 'file tree', 'array');
                 $pieceLayers = self::checkTorrentDict($this->data, 'piece layers', 'array');
 
-                $loopMerkleTree = function (&$merkleTree, &$paths = []) use (&$files, &$size, $pieceLayers, $parseValidator, $pieceLength, &$loopMerkleTree) {
+                $loopMerkleTree = function (&$merkleTree, &$paths = []) use (&$files, &$size, $pieceLayers, $addFile, $pieceLength, &$loopMerkleTree) {
                     if (isset($merkleTree[''])) {  // reach file
                         $file = $merkleTree[''];
 
@@ -580,16 +589,11 @@ class TorrentFile
                             }
                         }
 
-                        if ($parseValidator instanceof \Closure) {
-                            call_user_func($parseValidator, self::arrayEnd($paths), $paths);
-                        }
-
-                        $size += $length;
-                        $files[] = ['path' => implode('/', $paths), 'size' => $length];
-
-                        $merkleTree = $length;  // rewrite merkleTree to size, it not affect $data['info']['file tree']
+                        $addFile($paths, $length);
+                        $merkleTree = $length;  // rewrite merkleTree to size, it's safe since it not affect $data['info']['file tree']
                     } else {
                         $parent_path = $paths;  // store parent paths
+                        /** @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection */
                         foreach ($merkleTree as $k => &$v) {  // Loop tree
                             $paths[] = $k;   // push current path into paths
                             $loopMerkleTree($v, $paths);  // Loop check
@@ -608,7 +612,7 @@ class TorrentFile
             }
 
             $this->cache['parsed'] = [
-                'total_size' => $size,
+                'total_size' => $totalSize,
                 'count' => count($files),
                 'files' => $files,
                 'fileTree' => $fileTree
