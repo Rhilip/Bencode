@@ -202,6 +202,15 @@ $torrent
   ])
   ->setSouce('example.com')
   ->setPrivate(true);
+
+// Note 2: parse method may fail when get a deep invalid torrent, so it can wrapper like this
+try {
+    $torrent = TorrentFile::load($_POST['torrent']);
+    $torrent/** ->setParseValidator(function () {}) */->parse();
+} catch (ParseException $e) {
+    // do something to notice user.
+}
+print($torrent->getFileCount()); // safe to use other method without any ParseException
 ```
 
 ## License
