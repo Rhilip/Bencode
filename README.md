@@ -18,6 +18,7 @@ composer require rhilip/bencode
 ```
 
 if you don't use `Rhilip\Bencode\TorrentFile` class, you can specific version to `1.x.x`
+and if your PHP version is `5.6` or `7.0-7.2`, please stop at version `1.2.0` and `2.0.0`
 
 ```shell script
 composer require rhilip/bencode:1.2.0
