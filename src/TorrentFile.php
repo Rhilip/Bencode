@@ -609,6 +609,7 @@ class TorrentFile
 
             $this->cache['parsed'] = [
                 'total_size' => $size,
+                'count' => count($files),
                 'files' => $files,
                 'fileTree' => $fileTree
             ];
@@ -623,7 +624,7 @@ class TorrentFile
 
     public function getFileCount()
     {
-        return count($this->getFileList());
+        return $this->parse()['count'];
     }
 
     /**
