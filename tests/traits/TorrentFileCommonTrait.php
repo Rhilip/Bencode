@@ -19,7 +19,7 @@ trait TorrentFileCommonTrait
     protected $pieceLength = 65536;
     protected $source = 'Rhilip';
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->torrent = TorrentFile::load("tests/asserts/{$this->protocol}-{$this->fileMode}.torrent");
     }

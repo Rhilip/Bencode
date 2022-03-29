@@ -53,16 +53,17 @@ class TorrentFile
     protected static function checkTorrentDict($dict, $key, $type = null)
     {
         if (!is_array($dict)) {
-            throw new ParseException('std_not_a_dictionary');
+            throw new ParseException('Checking non-dictionary value.');
         }
         $value = $dict[$key];
         if (!isset($value)) {
-            throw new ParseException('std_dictionary_is_missing_key');
+            throw new ParseException("Checking Dictionary missing key: {$key}");
         }
         if (!is_null($type)) {
             $isFunction = 'is_' . $type;
             if (function_exists($isFunction) && !$isFunction($value)) {
-                throw new ParseException('std_invalid_entry_in_dictionary');
+                $valueType = gettype($value);
+                throw new ParseException("Invalid entry type in dictionary, want : {$type}, current: {$valueType}");
             }
         }
         return $value;
@@ -121,7 +122,7 @@ class TorrentFile
 
     public function getRootField($field, $default = null)
     {
-        return $this->data[$field] ?? $default;
+        return isset($this->data[$field]) ? $this->data[$field] : $default;
     }
 
     public function setRootField($field, $value)
@@ -266,7 +267,7 @@ class TorrentFile
 
     public function getInfoField($field, $default = null)
     {
-        return $this->data['info'][$field] ?? $default;
+        return isset($this->data['info'][$field]) ? $this->data['info'][$field] : $default;
     }
 
     public function setInfoField($field, $value)
@@ -387,7 +388,7 @@ class TorrentFile
      */
     public function getInfoHash($binary = false)
     {
-        return $this->getInfoHashV2($binary) ?: $this->getInfoHashV1($binary) ?: throw new ParseException('Invalid metadata');
+        return $this->getInfoHashV2($binary) ?: $this->getInfoHashV1($binary);
     }
 
     /**
@@ -514,7 +515,7 @@ class TorrentFile
             if ($this->getProtocol() === self::PROTOCOL_V1) {  // Do what we do in protocol v1
                 $pieces = self::checkTorrentDict($info, 'pieces', 'string');
                 if (strlen($pieces) % 20 != 0) {
-                    throw new ParseException('std_invalid_pieces');
+                    throw new ParseException('Invalid pieces length.');
                 }
 
                 if ($this->getFileMode() === self::FILEMODE_SINGLE) {
@@ -525,11 +526,11 @@ class TorrentFile
                     foreach ($torrentFiles as $file) {
                         $length = self::checkTorrentDict($file, 'length', 'integer');
                         $path_key = isset($file['path.utf-8']) ? 'path.utf-8' : 'path';
-                        $paths = self::checkTorrentDict($file, $path_key, 'list');
+                        $paths = self::checkTorrentDict($file, $path_key, 'array');
 
                         foreach ($paths as $path) {
                             if (!is_string($path)) {
-                                throw new ParseException('std_filename_errors');
+                                throw new ParseException('Invalid path with non-string value.');
                             }
                         }
 
@@ -544,7 +545,7 @@ class TorrentFile
             } else {
                 $picesLength = $this->getPieceLength();
                 $fileTree = self::checkTorrentDict($info, 'file tree', 'array');
-                $pieceLayers = self::checkTorrentDict($this->data, 'piece layers');
+                $pieceLayers = self::checkTorrentDict($this->data, 'piece layers','array');
 
                 $loopMerkleTree = function (&$merkleTree, &$paths = []) use (&$files, &$size, $pieceLayers, $parseValidator, $picesLength, &$loopMerkleTree) {
                     if (isset($merkleTree[''])) {  // reach file
@@ -552,13 +553,13 @@ class TorrentFile
 
                         $piecesRoot = self::checkTorrentDict($file, 'pieces root', 'string');
                         if (strlen($piecesRoot) != 32) {
-                            throw new ParseException('std_invalid_pieces_root');
+                            throw new ParseException('Invalid pieces_root length.');
                         }
 
                         $length = self::checkTorrentDict($file, 'length', 'integer');
                         if ($length > $picesLength) {  // check pieces root of large file is exist in $root['picec layers'] or not
                             if (!array_key_exists($piecesRoot, $pieceLayers)) {
-                                throw new ParseException('long pieces not exist in piece layers');
+                                throw new ParseException('Pieces not exist in piece layers.');
                             }
                         }
 
@@ -573,7 +574,7 @@ class TorrentFile
                     } else {
                         $parent_path = $paths;  // store parent paths
                         foreach ($merkleTree as $k => &$v) {  // Loop tree
-                            array_push($paths, $k);   // push current path into paths
+                            $paths[] = $k;   // push current path into paths
                             $loopMerkleTree($v, $paths);  // Loop check
                             $paths = $parent_path;  // restore parent paths
                         }
