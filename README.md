@@ -134,6 +134,10 @@ $torrent->cleanInfoFields(?$allowedKeys);  // remove fields which is not allowed
 $protocol = $torrent->getProtocol();  // TorrentFile::PROTOCOL_{V1,V2,HYBRID}
 $fileMode = $torrent->getFileMode();  // TorrentFile::FILEMODE_{SINGLE,MULTI}
 
+/**
+ * @note since we may edit $root['info'], so when call ->getInfoHash* method, 
+ *       we will calculate it each call without cache return-value. 
+ */
 $torrent->getInfoHashV1(?$binary);  // If $binary is true return 20-bytes string, otherwise 40-character hexadecimal number
 $torrent->getInfoHashV2(?$binary);  // If $binary is true return 32-bytes string, otherwise 64-character hexadecimal number
 $torrent->getInfoHash(?$binary);   // return v2-infohash if there is one, otherwise return v1-infohash
@@ -174,11 +178,11 @@ $torrent->setParseValidator(function ($filename, $paths) {
  * parse method will automatically called when use getSize, getFileCount, getFileList, getFileTree method,
  * However you can also call parse method manually.
  */ 
-$torrent->parse();  // ['total_size' => $size, 'files' => $fileList, 'fileTree' => $fileTree]
+$torrent->parse();  // ['total_size' => $totalSize, 'count' => $count, 'files' => $fileList, 'fileTree' => $fileTree]
 
 /**
  * Note: Since we prefer to parse `file tree` in info dict in v2 or hybrid torrent,
- * The padding file will not count in size, fileCount, fileList and fileTree.
+ * The padding file may not count in size, fileCount, fileList and fileTree.
  */
 $size = $torrent->getSize();
 $count = $torrent->getFileCount();
