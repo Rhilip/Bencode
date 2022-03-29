@@ -131,6 +131,12 @@ trait TorrentFileCommonTrait
         }
     }
 
+    public function testInfoHashNotChangeAfterParse()
+    {
+        $this->torrent->parse();
+        $this->testInfoHash();
+    }
+
     public function testGetPieceLength()
     {
         $this->assertEquals($this->pieceLength, $this->torrent->getPieceLength());
@@ -174,6 +180,15 @@ trait TorrentFileCommonTrait
         $source = "new source";
         $this->torrent->setSouce($source);
         $this->assertEquals($source, $this->torrent->getSource());
+    }
+
+    public function testInfoChangeByEdit(){
+        $infoHashs = $this->torrent->getInfoHashs();
+
+        $this->torrent->setInfoField('rhilip','bencode');
+
+        // infohash should change since we edit info field
+        $this->assertNotEqualsCanonicalizing($infoHashs, $this->torrent->getInfoHashs());
     }
 
     public function testPrivate()
