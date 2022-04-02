@@ -467,10 +467,18 @@ class TorrentFile
      * clients supporting it natively. Returns a boolean on whether or not the source was changed
      * so that an appropriate screen can be shown to the user.
      */
-    public function setSouce($souce)
+    public function setSource($source)
     {
         $this->unsetInfoField('x_cross_seed')->unsetInfoField('unique');
-        return $this->setInfoField('source', $souce);
+        return $this->setInfoField('source', $source);
+    }
+
+    /**
+     * @deprecated typo of function `setSource`
+     */
+    public function setSouce($source)
+    {
+        return $this->setSource($source);
     }
 
     public function isPrivate()

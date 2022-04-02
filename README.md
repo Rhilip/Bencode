@@ -155,7 +155,7 @@ try {
 }
 $name = $torrent->getName();
 
-$torrent->setSouce('Rhilip\'s blog');
+$torrent->setSource('Rhilip\'s blog');
 $source = $torrent->getSource();
 
 $private = $torrent->isPrivate();  // true or false
