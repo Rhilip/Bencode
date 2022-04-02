@@ -178,7 +178,7 @@ trait TorrentFileCommonTrait
         $this->assertEquals($this->source, $this->torrent->getSource());
 
         $source = "new source";
-        $this->torrent->setSouce($source);
+        $this->torrent->setSource($source);
         $this->assertEquals($source, $this->torrent->getSource());
     }
 
