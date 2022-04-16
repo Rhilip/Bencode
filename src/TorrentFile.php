@@ -422,7 +422,7 @@ class TorrentFile
     /**
      * The 20-bytes truncated infohash
      */
-    public function getInfoHashsForAnnnounce()
+    public function getInfoHashsForAnnounce()
     {
         return [
             self::PROTOCOL_V1 => $this->getInfoHashV1ForAnnounce(),
@@ -471,14 +471,6 @@ class TorrentFile
     {
         $this->unsetInfoField('x_cross_seed')->unsetInfoField('unique');
         return $this->setInfoField('source', $source);
-    }
-
-    /**
-     * @deprecated typo of function `setSource`
-     */
-    public function setSouce($source)
-    {
-        return $this->setSource($source);
     }
 
     public function isPrivate()

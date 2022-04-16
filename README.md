@@ -144,7 +144,7 @@ $torrent->getInfoHash(?$binary);   // return v2-infohash if there is one, otherw
 $torrent->getInfoHashs(?$binary);  // return [TorrentFile::PROTOCOL_V1 => v1-infohash, TorrentFile::PROTOCOL_V2 => v2-infohash]
 $torrent->getInfoHashV1ForAnnounce();  // return the v1 info-hash in announce ( 20-bytes string )
 $torrent->getInfoHashV2ForAnnounce();  // return the v2 (truncated) info-hash in announce
-$torrent->getInfoHashsForAnnnounce();  // same as getInfoHashs() but in announce
+$torrent->getInfoHashsForAnnounce();  // same as getInfoHashs() but in announce
 
 $torrent->getPieceLength();  // int
 
