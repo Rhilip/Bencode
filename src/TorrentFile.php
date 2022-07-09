@@ -487,6 +487,22 @@ class TorrentFile
     }
 
     /**
+     * Get Torrent Magnet URI
+     * @return string
+     */
+    public function getMagnet(): string
+    {
+        $announceList = [];
+        foreach ($this->getAnnounceList() as $tier) {
+            foreach ($tier as $announce) {
+                $announceList[] = rawurlencode($announce);
+            }
+        }
+        $trackers = implode('&tr=', $announceList);
+        return "magnet:?xt=urn:btih:{$this->getInfoHash()}&dn={$this->getName()}{$trackers}";
+    }
+
+    /**
      * Utility function to clean out keys in the data and info dictionaries that we don't need in
      * our torrent file when we go to store it in the DB or serve it up to the user (with the
      * expectation that we'll be calling at least setAnnounceUrl(...) when a user asks for a valid

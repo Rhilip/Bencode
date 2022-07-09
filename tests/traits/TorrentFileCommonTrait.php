@@ -287,4 +287,33 @@ trait TorrentFileCommonTrait
         });
         $this->torrent->parse();
     }
+
+    public function testGetMagnet()
+    {
+        $uri = $this->torrent->getMagnet();
+
+        if ($this->protocol === TorrentFile::PROTOCOL_HYBRID) {
+            if ($this->fileMode === TorrentFile::FILEMODE_MULTI) {
+                $this->assertEquals('magnet:?xt=urn:btih:3f6fb45188917a8aed604ba7f399843f7891f68748bef89b7692465656ca6076&dn=tnamehttps%3A%2F%2Fexample.com%2Fannounce&tr=https%3A%2F%2Fexample1.com%2Fannounce', $uri);
+            } else if ($this->fileMode === TorrentFile::FILEMODE_SINGLE) {
+                $this->assertEquals('magnet:?xt=urn:btih:fd0e265c50a080759b61e7a66cf9c9a00af0256815e96a4c3564f733127dda46&dn=file1.dathttps%3A%2F%2Fexample.com%2Fannounce&tr=https%3A%2F%2Fexample1.com%2Fannounce', $uri);
+            }
+        }
+
+        if ($this->protocol === TorrentFile::PROTOCOL_V1) {
+            if ($this->fileMode === TorrentFile::FILEMODE_MULTI) {
+                $this->assertEquals('magnet:?xt=urn:btih:344f85b35113783a34bb22ba7661fa26f1046bd1&dn=tnamehttps%3A%2F%2Fexample.com%2Fannounce&tr=https%3A%2F%2Fexample1.com%2Fannounce', $uri);
+            } else if ($this->fileMode === TorrentFile::FILEMODE_SINGLE) {
+                $this->assertEquals('magnet:?xt=urn:btih:d0e710431bed8cb4b1860b9a7a40a20df8de8266&dn=file1.dathttps%3A%2F%2Fexample.com%2Fannounce&tr=https%3A%2F%2Fexample1.com%2Fannounce', $uri);
+            }
+        }
+
+        if ($this->protocol === TorrentFile::PROTOCOL_V2) {
+            if ($this->fileMode === TorrentFile::FILEMODE_MULTI) {
+                $this->assertEquals('magnet:?xt=urn:btih:832d96b4f8b422aa75f8d40975b1a408154bc1a2bdffccf7b689386cde125a30&dn=tnamehttps%3A%2F%2Fexample.com%2Fannounce&tr=https%3A%2F%2Fexample1.com%2Fannounce', $uri);
+            } else if ($this->fileMode === TorrentFile::FILEMODE_SINGLE) {
+                $this->assertEquals('magnet:?xt=urn:btih:a58e747f0ce2c2073c6fd635d4afdd5c6162574d6c9184318f884f553c3ed65b&dn=file1.dathttps%3A%2F%2Fexample.com%2Fannounce&tr=https%3A%2F%2Fexample1.com%2Fannounce', $uri);
+            }
+        }
+    }
 }
