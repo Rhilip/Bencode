@@ -103,7 +103,7 @@ $torrent->cleanRootFields(?$allowedKeys);  // remove fields which is not allowed
 $torrent->setAnnounce('udp://example.com/announce');
 $announce = $torrent->getAnnounce();
 
-$torrent->setAnnounceList([['https://example1.com/announce'], ['https://example2.com/announce'], 'https://example3.com/announce']);
+$torrent->setAnnounceList([['https://example1.com/announce'], ['https://example2.com/announce', 'https://example3.com/announce']]);
 $announceList = $torrent->getAnnounceList();
 
 $torrent->setComment('Rhilip\'s Torrent');
