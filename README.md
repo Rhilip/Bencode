@@ -161,6 +161,8 @@ $source = $torrent->getSource();
 $private = $torrent->isPrivate();  // true or false
 $torrent->setPrivate(true);
 
+$magnetLink = $torrent->getMagnetLink();
+
 // 5. Work with torrent, it will try to parse torrent ( cost time )
 $torrent->setParseValidator(function ($filename, $paths) {
     /**
@@ -200,12 +202,12 @@ $torrent
     ['https://example.com/announce'],
     ['https://example1.com/announce']
   ])
-  ->setSouce('example.com')
+  ->setSource('example.com')
   ->setPrivate(true);
 
 // Note 2: parse method may fail when get a deep invalid torrent, so it can wrapper like this
 try {
-    $torrent = TorrentFile::load($_POST['torrent']);
+    $torrent = TorrentFile::load($_POST['torrent']['tmp_name']);
     $torrent/** ->setParseValidator(function () {}) */->parse();
 } catch (ParseException $e) {
     // do something to notice user.

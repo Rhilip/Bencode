@@ -271,7 +271,7 @@ class TorrentFile
 
     public function getInfoField($field, $default = null)
     {
-        return isset($this->data['info'][$field]) ? $this->data['info'][$field] : $default;
+        return $this->data['info'][$field] ?? $default;
     }
 
     public function setInfoField($field, $value)
@@ -487,6 +487,56 @@ class TorrentFile
     }
 
     /**
+     * Get Torrent Magnet URI
+     * @return string
+     */
+    public function getMagnetLink($dn = true, $tr = true)
+    {
+        $urlSearchParams = [];
+
+        $infoHashV1 = $this->getInfoHashV1();
+        if ($infoHashV1) {
+            $urlSearchParams[] = 'xt=urn:btih:' . $infoHashV1;
+        }
+
+        $infoHashV2 = $this->getInfoHashV2();
+        if ($infoHashV2) {
+            $urlSearchParams[] = 'xt=url:btmh:' . '1220' . $infoHashV2;  // 1220 is magic number
+        }
+
+        if ($dn) {
+            $name = $this->getName() ?? '';
+            if ($name !== '') {
+                $urlSearchParams[] = 'dn=' . rawurlencode($name);
+            }
+        }
+
+        if ($tr) {
+            $trackers = [];
+
+            $announceList = $this->getAnnounceList();
+            if ($announceList) {
+                foreach ($announceList as $tier) {
+                    foreach ($tier as $tracker) {
+                        $trackers[] = $tracker;
+                    }
+                }
+            } else {
+                $rootTracker = $this->getAnnounce();
+                if ($rootTracker) {
+                    $trackers[] = $rootTracker;
+                }
+            }
+
+            foreach (array_unique($trackers) as $tracker) {
+                $urlSearchParams[] = 'tr=' . rawurlencode($tracker);
+            }
+        }
+
+        return 'magnet:?' . implode('&', $urlSearchParams);
+    }
+
+    /**
      * Utility function to clean out keys in the data and info dictionaries that we don't need in
      * our torrent file when we go to store it in the DB or serve it up to the user (with the
      * expectation that we'll be calling at least setAnnounceUrl(...) when a user asks for a valid
@@ -667,7 +717,8 @@ class TorrentFile
     }
 
     // Wrapper end function to avoid change the internal pointer of $path,
-    private static function arrayEnd($array) {
+    private static function arrayEnd($array)
+    {
         return end($array);
     }
 }
