@@ -210,12 +210,12 @@ trait TorrentFileCommonTrait
         }
 
         if ($this->protocol === TorrentFile::PROTOCOL_V2) {
-            $xtComponent = 'xt=url:btmh:1220' . $this->infoHashs[TorrentFile::PROTOCOL_V2];
+            $xtComponent = 'xt=urn:btmh:1220' . $this->infoHashs[TorrentFile::PROTOCOL_V2];
         }
 
         if ($this->protocol === TorrentFile::PROTOCOL_HYBRID) {
             $xtComponent = 'xt=urn:btih:' . $this->infoHashs[TorrentFile::PROTOCOL_V1] .
-                '&xt=url:btmh:1220' . $this->infoHashs[TorrentFile::PROTOCOL_V2];
+                '&xt=urn:btmh:1220' . $this->infoHashs[TorrentFile::PROTOCOL_V2];
         }
 
         $name = $this->fileMode === TorrentFile::FILEMODE_MULTI ? 'tname' : 'file1.dat';

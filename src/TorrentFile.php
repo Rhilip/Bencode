@@ -501,7 +501,7 @@ class TorrentFile
 
         $infoHashV2 = $this->getInfoHashV2();
         if ($infoHashV2) {
-            $urlSearchParams[] = 'xt=url:btmh:' . '1220' . $infoHashV2;  // 1220 is magic number
+            $urlSearchParams[] = 'xt=urn:btmh:' . '1220' . $infoHashV2;  // 1220 is magic number
         }
 
         if ($dn) {
