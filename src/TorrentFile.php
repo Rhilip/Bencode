@@ -307,7 +307,7 @@ class TorrentFile
         $allowedKeys = array_merge([
             'name', 'private', 'piece length', // Common key
             'files', 'pieces', 'length',  // v1
-            'files tree', 'meta version', // v2
+            'file tree', 'meta version', // v2
         ], $allowedKeys);
         foreach ($this->data['info'] as $key => $value) {
             if (!in_array($key, $allowedKeys)) {
