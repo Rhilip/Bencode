@@ -657,6 +657,7 @@ class TorrentFile
             // Fix fileTree for multi torrent
             if ($this->getFileMode() === self::FILEMODE_MULTI) {
                 $torrentName = $this->getName();
+                ksort($fileTree); // #16
                 $fileTree = [$torrentName => $fileTree];
             }
 
