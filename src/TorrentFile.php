@@ -40,7 +40,7 @@ class TorrentFile
     public const FILETREE_SORT_NORMAL = 0x00;
     public const FILETREE_SORT_STRING = 0x01;
     public const FILETREE_SORT_FOLDER = 0x10;
-    public const FILETREE_SORT_NATURAL = 0x11;  // same as self::FILETREE_SORT_NAME | self::FILETREE_SORT_FOLDER
+    public const FILETREE_SORT_NATURAL = 0x11;  // same as `self::FILETREE_SORT_STRING | self::FILETREE_SORT_FOLDER`
 
     // store torrent dict
     private $data;
@@ -700,16 +700,16 @@ class TorrentFile
         return $this->parse()['files'];
     }
 
-    private static function sortFileTreeRecursive(array &$fileTree, $sortByName = false, $sortByFolder = false): array
+    private static function sortFileTreeRecursive(array &$fileTree, $sortByString = false, $sortByFolder = false): array
     {
-        if ($sortByName) {
+        if ($sortByString) {
             ksort($fileTree, SORT_NATURAL | SORT_FLAG_CASE);
         }
 
         $isoFile = [];
         foreach ($fileTree as $key => &$item) {
             if (is_array($item)) {
-                $fileTree[$key] = self::sortFileTreeRecursive($item, $sortByName, $sortByFolder);
+                $fileTree[$key] = self::sortFileTreeRecursive($item, $sortByString, $sortByFolder);
             } else if ($sortByFolder) {
                 $isoFile[$key] = $item;
                 unset($fileTree[$key]);
@@ -734,11 +734,11 @@ class TorrentFile
     {
         $fileTree = $this->parse()['fileTree'];
 
-        $sortByName = ($sortType & self::FILETREE_SORT_STRING) === self::FILETREE_SORT_STRING;
+        $sortByString = ($sortType & self::FILETREE_SORT_STRING) === self::FILETREE_SORT_STRING;
         $sortByFolder = ($sortType & self::FILETREE_SORT_FOLDER) === self::FILETREE_SORT_FOLDER;
 
-        if ($sortByName || $sortByFolder) {
-            self::sortFileTreeRecursive($fileTree, $sortByName, $sortByFolder);
+        if ($sortByString || $sortByFolder) {
+            self::sortFileTreeRecursive($fileTree, $sortByString, $sortByFolder);
         }
 
         return $fileTree;

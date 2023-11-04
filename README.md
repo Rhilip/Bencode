@@ -217,10 +217,10 @@ $fileList = $torrent->getFileList();
  *  - TorrentFile::FILETREE_SORT_NORMAL : not sort, also means sort by torrent file parsed order 
  *  - TorrentFile::FILETREE_SORT_STRING : sort by filename ASC ("natural ordering" and "case-insensitively")
  *  - TorrentFile::FILETREE_SORT_FOLDER : sort by filetype (first folder, then file)
- *  - TorrentFile::FILETREE_SORT_NATURAL: sort by both filetype and filename ( same as `TorrentFile::FILETREE_SORT_NAME | TorrentFile::FILETREE_SORT_FOLDER` )
+ *  - TorrentFile::FILETREE_SORT_NATURAL: sort by both filetype and filename ( same as `TorrentFile::FILETREE_SORT_STRING | TorrentFile::FILETREE_SORT_FOLDER` )
  * 
  */
-$fileTree = $torrent->getFileTree(?$sortType = self::FILETREE_SORT_NORMAL);
+$fileTree = $torrent->getFileTree(?$sortType = TorrentFile::FILETREE_SORT_NORMAL);
 
 // 6. Other method
 $torrent->cleanCache();
