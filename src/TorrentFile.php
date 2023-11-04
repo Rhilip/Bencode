@@ -710,7 +710,7 @@ class TorrentFile
         foreach ($fileTree as $key => &$item) {
             if (is_array($item)) {
                 $fileTree[$key] = self::sortFileTreeRecursive($item, $sortByString, $sortByFolder);
-            } else if ($sortByFolder) {
+            } elseif ($sortByFolder) {
                 $isoFile[$key] = $item;
                 unset($fileTree[$key]);
             }
