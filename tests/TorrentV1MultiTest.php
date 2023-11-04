@@ -58,14 +58,25 @@ class TorrentV1MultiTest extends TestCase
         $this->torrent->parse();
     }
 
-    public function testFilesPathEntityNotString() {
+    public function testFilesPathEntityWithNotString() {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Invalid path with non-string value');
+        $this->expectExceptionMessage('Invalid path with non-string or empty-string value');
 
         $files = $this->torrent->getInfoField('files');
         $files[0]['path'][0] = 123;
-
         $this->torrent->setInfoField('files', $files);
+
+        $this->torrent->parse();
+    }
+
+    public function testFilesPathEntityWithEmptyString() {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Invalid path with non-string or empty-string value');
+
+        $files = $this->torrent->getInfoField('files');
+        $files[0]['path'][0] = '';
+        $this->torrent->setInfoField('files', $files);
+
         $this->torrent->parse();
     }
 }

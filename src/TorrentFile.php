@@ -602,8 +602,8 @@ class TorrentFile
                         $paths = self::checkTorrentDict($file, $path_key, 'array');
 
                         foreach ($paths as $path) {
-                            if (!is_string($path)) {
-                                throw new ParseException('Invalid path with non-string value');
+                            if (!is_string($path) || $path === '') {
+                                throw new ParseException('Invalid path with non-string or empty-string value');
                             }
                         }
 
