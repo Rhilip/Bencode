@@ -154,7 +154,7 @@ class TorrentFile
      * store the smallest encoded string within the database and cuts down on potential waste.
      */
     public function cleanRootFields($allowedKeys = [
-        'comment', 'created by', 'creation date' // Other keys
+        'comment', 'created by', 'creation date', 'encoding' // Other keys
     ])
     {
         $allowedKeys = array_merge([
