@@ -32,13 +32,20 @@ class TorrentFile
     public const PROTOCOL_V2 = 'v2';  // Version 2 of the BitTorrent protocol, using SHA-256 hashes
     public const PROTOCOL_HYBRID = 'hybrid';  // Torrent with both v1 and v2 support
 
+    // BitTorrent File Mode
     public const FILEMODE_SINGLE = 'single';
     public const FILEMODE_MULTI = 'multi';
+
+    // Control for ->getFileTree() output, by default it is normal as parsed order
+    public const FILETREE_SORT_NORMAL = 0x00;
+    public const FILETREE_SORT_STRING = 0x01;
+    public const FILETREE_SORT_FOLDER = 0x10;
+    public const FILETREE_SORT_NATURAL = 0x11;  // same as self::FILETREE_SORT_NAME | self::FILETREE_SORT_FOLDER
 
     // store torrent dict
     private $data;
 
-    // we may have some tmp data when parse, so we store here to avoid regenerate
+    // we may have some tmp data when parsed, so we store here to avoid regenerate
     private $cache = [];
 
     // Custom validator for parse torrent
@@ -693,6 +700,25 @@ class TorrentFile
         return $this->parse()['files'];
     }
 
+    private static function sortFileTreeRecursive(array &$fileTree, $sortByName = false, $sortByFolder = false): array
+    {
+        if ($sortByName) {
+            ksort($fileTree, SORT_NATURAL | SORT_FLAG_CASE);
+        }
+
+        $isoFile = [];
+        foreach ($fileTree as $key => &$item) {
+            if (is_array($item)) {
+                $fileTree[$key] = self::sortFileTreeRecursive($item, $sortByName, $sortByFolder);
+            } else if ($sortByFolder) {
+                $isoFile[$key] = $item;
+                unset($fileTree[$key]);
+            }
+        }
+        $fileTree = array_merge($fileTree, $isoFile);
+        return $fileTree;
+    }
+
     /**
      * Return a dict like:
      * [
@@ -704,9 +730,18 @@ class TorrentFile
      *    ]
      * ]
      */
-    public function getFileTree()
+    public function getFileTree($sortType = self::FILETREE_SORT_NORMAL)
     {
-        return $this->parse()['fileTree'];
+        $fileTree = $this->parse()['fileTree'];
+
+        $sortByName = ($sortType & self::FILETREE_SORT_STRING) === self::FILETREE_SORT_STRING;
+        $sortByFolder = ($sortType & self::FILETREE_SORT_FOLDER) === self::FILETREE_SORT_FOLDER;
+
+        if ($sortByName || $sortByFolder) {
+            self::sortFileTreeRecursive($fileTree, $sortByName, $sortByFolder);
+        }
+
+        return $fileTree;
     }
 
     public function cleanCache()

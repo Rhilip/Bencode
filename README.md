@@ -188,8 +188,39 @@ $torrent->parse();  // ['total_size' => $totalSize, 'count' => $count, 'files' =
  */
 $size = $torrent->getSize();
 $count = $torrent->getFileCount();
+
+/**
+ * Return a list like:
+ * [
+ *   ["path" => "filename1", "size" => 123],   //  123 is file size
+ *   ["path" => "directory/filename2", "size" => 2345]
+ * ]
+ *
+ */
 $fileList = $torrent->getFileList();
-$fileTree = $torrent->getFileTree();
+
+
+/**
+ * Return a dict like:
+ * [
+ *     "torrentname" => [
+ *         "directory" => [
+ *             "filename2" => 2345
+ *         ],
+ *         "filename1" => 123
+ *    ]
+ * ]
+ *
+ * > Add in v2.4.0
+ * You can now pass argument to control the fileTree sort type. By default, this argument is TorrentFile::FILETREE_SORT_NORMAL.
+ * Control Const (see different in `tests/TorrentFileTreeSortTest.php` file):
+ *  - TorrentFile::FILETREE_SORT_NORMAL : not sort, also means sort by torrent file parsed order 
+ *  - TorrentFile::FILETREE_SORT_STRING : sort by filename ASC ("natural ordering" and "case-insensitively")
+ *  - TorrentFile::FILETREE_SORT_FOLDER : sort by filetype (first folder, then file)
+ *  - TorrentFile::FILETREE_SORT_NATURAL: sort by both filetype and filename ( same as `TorrentFile::FILETREE_SORT_NAME | TorrentFile::FILETREE_SORT_FOLDER` )
+ * 
+ */
+$fileTree = $torrent->getFileTree(?$sortType = self::FILETREE_SORT_NORMAL);
 
 // 6. Other method
 $torrent->cleanCache();
