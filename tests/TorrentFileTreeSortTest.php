@@ -9,7 +9,7 @@ class TorrentFileTreeSortTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->torrent = TorrentFile::load("tests/asserts/test_tree_sort.torrent");
+        $this->torrent = TorrentFile::load("tests/asserts/test-tree-sort.torrent");
         $this->torrent->parse();
     }
 
@@ -28,7 +28,8 @@ class TorrentFileTreeSortTest extends TestCase
                     ]
                 ]
             ]),
-            json_encode($this->torrent->getFileTree()));
+            json_encode($this->torrent->getFileTree())
+        );
     }
 
     public function testGetFileTreeByString()
@@ -46,7 +47,8 @@ class TorrentFileTreeSortTest extends TestCase
                     ],
                 ]
             ]),
-            json_encode($this->torrent->getFileTree(TorrentFile::FILETREE_SORT_STRING)));
+            json_encode($this->torrent->getFileTree(TorrentFile::FILETREE_SORT_STRING))
+        );
     }
 
     public function testGetFileTreeByFolder()
@@ -64,7 +66,8 @@ class TorrentFileTreeSortTest extends TestCase
                     'file.txt' => 1048576
                 ]
             ]),
-            json_encode($this->torrent->getFileTree(TorrentFile::FILETREE_SORT_FOLDER)));
+            json_encode($this->torrent->getFileTree(TorrentFile::FILETREE_SORT_FOLDER))
+        );
     }
 
     public function testGetFileTreeByNatural()
@@ -82,6 +85,7 @@ class TorrentFileTreeSortTest extends TestCase
                     'file.txt' => 1048576
                 ]
             ]),
-            json_encode($this->torrent->getFileTree(TorrentFile::FILETREE_SORT_NATURAL)));
+            json_encode($this->torrent->getFileTree(TorrentFile::FILETREE_SORT_NATURAL))
+        );
     }
 }

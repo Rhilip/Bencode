@@ -700,7 +700,7 @@ class TorrentFile
         return $this->parse()['files'];
     }
 
-    private static function sortFileTreeRecursive(array &$fileTree, $sortByString = false, $sortByFolder = false): array
+    private static function sortFileTreeRecursive(array &$fileTree, $sortByString = false, $sortByFolder = false)
     {
         if ($sortByString) {
             ksort($fileTree, SORT_NATURAL | SORT_FLAG_CASE);
@@ -709,14 +709,15 @@ class TorrentFile
         $isoFile = [];
         foreach ($fileTree as $key => &$item) {
             if (is_array($item)) {
-                $fileTree[$key] = self::sortFileTreeRecursive($item, $sortByString, $sortByFolder);
+                self::sortFileTreeRecursive($item, $sortByString, $sortByFolder);
             } elseif ($sortByFolder) {
                 $isoFile[$key] = $item;
                 unset($fileTree[$key]);
             }
         }
-        $fileTree = array_merge($fileTree, $isoFile);
-        return $fileTree;
+        if ($sortByFolder && !empty($isoFile)) {
+            $fileTree = array_merge($fileTree, $isoFile);
+        }
     }
 
     /**
@@ -726,7 +727,7 @@ class TorrentFile
      *         "directory" => [
      *             "filename2" => 2345
      *         ],
-     *         "filename1" => 123
+     *         "filename1" => 123  //  123 is file size
      *    ]
      * ]
      */
@@ -736,7 +737,6 @@ class TorrentFile
 
         $sortByString = ($sortType & self::FILETREE_SORT_STRING) === self::FILETREE_SORT_STRING;
         $sortByFolder = ($sortType & self::FILETREE_SORT_FOLDER) === self::FILETREE_SORT_FOLDER;
-
         if ($sortByString || $sortByFolder) {
             self::sortFileTreeRecursive($fileTree, $sortByString, $sortByFolder);
         }
