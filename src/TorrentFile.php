@@ -649,8 +649,6 @@ class TorrentFile
     protected function parseV2Torrent()
     {
         $fileTree = self::checkTorrentDict($this->getInfoData(), 'file tree', 'array');
-        self::checkTorrentDict($this->data, 'piece layers', 'array');
-
         $this->loopMerkleTree($fileTree);
         $this->cache['fileTree'] = $fileTree;
     }
@@ -673,6 +671,7 @@ class TorrentFile
                 $this->parseV1MultiTorrent();
             }
         } else {
+            self::checkTorrentDict($this->getRootData(), 'piece layers', 'array');
             $this->parseV2Torrent();
         }
 
