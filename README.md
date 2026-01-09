@@ -118,7 +118,11 @@ $creationDate = $torrent->getCreationDate();
 $torrent->setHttpSeeds(['udp://example.com/seed']);
 $httpSeeds = $torrent->getHttpSeeds();
 
-$torrent->setNodes(['udp://example.com/seed']);
+$torrent->setNodes([
+    ['127.0.0.1', 6881],
+    ['your.router.node', 4804],
+    ['2001:db8:100:0:d5c8:db3f:995e:c0f7', 1941],
+]);
 $nodes = $torrent->getNodes();
 
 $torrent->setUrlList(['udp://example.com/seed']);
