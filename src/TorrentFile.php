@@ -15,6 +15,18 @@ if (!function_exists('str_contains')) {
     }
 }
 
+if (!function_exists('array_last')) {
+    /**
+     * polyfill of array_last for PHP < 8.5.0
+     *
+     * @param array $array
+     * @return false|mixed|null
+     */
+    function array_last(array $array) {
+        return $array ? current(array_slice($array, -1)) : null;
+    }
+}
+
 /**
  * Additionally, as this is for torrent files, we can make the following assumptions
  * and requirements:
@@ -569,7 +581,7 @@ class TorrentFile
     protected function addFileToList($paths, $size)
     {
         if ($this->useParseValidator) {
-            call_user_func($this->parseValidator, self::arrayEnd($paths), $paths);
+            call_user_func($this->parseValidator, array_last($paths), $paths);
         }
         $this->cache['files'][] = ['path' => implode('/', $paths), 'size' => $size];
     }
@@ -777,11 +789,5 @@ class TorrentFile
     {
         $this->cache = [];
         return $this;
-    }
-
-    // Wrapper end function to avoid change the internal pointer of $path,
-    private static function arrayEnd($array)
-    {
-        return end($array);
     }
 }
