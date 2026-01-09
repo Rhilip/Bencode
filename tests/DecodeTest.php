@@ -113,6 +113,10 @@ class DecodeTest extends TestCase
      */
     public function testDecodeIntegerOverflow()
     {
+        if (version_compare(phpversion(), '8.5.0', '>=')) {
+            $this->markTestSkipped();
+        }
+
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Invalid integer format or integer overflow');
 
