@@ -8,8 +8,8 @@
 
 This is a pure PHP library that allows you to encode and decode Bencode data, with torrent file parse and vaildate.
 
-This library is fork from [OPSnet/bencode-torrent](https://github.com/OPSnet/bencode-torrent),
-with same method like [sandfoxme/bencode](https://github.com/arokettu/bencode), [sandfoxme/torrent-file](https://github.com/arokettu/torrent-file)
+This library is forked from [OPSnet/bencode-torrent](https://github.com/OPSnet/bencode-torrent),
+with almost same methods like [arokettu/bencode](https://github.com/arokettu/bencode), [arokettu/torrent-file](https://github.com/arokettu/torrent-file)
 
 ## Installation
 
@@ -241,7 +241,7 @@ $fileTree = $torrent->getFileTree(?$sortType = TorrentFile::FILETREE_SORT_NORMAL
 $v1ProtocolOnlyTorrent = $hybridTorrent->unhybridized(TorrentFile::PROTOCOL_V1);
 $v2ProtocolOnlyTorrent = $hybridTorrent->unhybridized(TorrentFile::PROTOCOL_V2);
 
-// 6. Other method
+// 7. Other method
 $torrent->cleanCache();
 
 // Note 1: clean,set,unset method are chaining
