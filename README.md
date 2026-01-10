@@ -203,7 +203,6 @@ $count = $torrent->getFileCount();
  */
 $fileList = $torrent->getFileList();
 
-
 /**
  * Return a dict like:
  * [
@@ -225,6 +224,22 @@ $fileList = $torrent->getFileList();
  * 
  */
 $fileTree = $torrent->getFileTree(?$sortType = TorrentFile::FILETREE_SORT_NORMAL);
+
+// 6. unhybridized
+/**
+ * > Add in v2.5.0
+ *
+ * Create an unhybridized copy of a hybrid torrent for the specified single protocol version
+ * (does not modify the original instance).
+ *
+ * This method returns a clone of the current object and removes metadata fields from the clone
+ * that are incompatible with the target version to produce an "unhybridized" torrent.
+ * For example:
+ *  when the target is `TorrentFile::PROTOCOL_V1`, v2 fields are removed;
+ *  when the target is `TorrentFile::PROTOCOL_V2`, v1 fields are removed.
+ */
+$v1ProtocolOnlyTorrent = $hybridTorrent->unhybridized(TorrentFile::PROTOCOL_V1);
+$v2ProtocolOnlyTorrent = $hybridTorrent->unhybridized(TorrentFile::PROTOCOL_V2);
 
 // 6. Other method
 $torrent->cleanCache();
