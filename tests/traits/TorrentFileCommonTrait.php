@@ -352,10 +352,10 @@ trait TorrentFileCommonTrait
     {
         if ($this->protocol == TorrentFile::PROTOCOL_HYBRID) {
             // After unhybridized to target 'v1' or 'v2', the returned torrent's protocol should be target protocol.
-            $v1ProtocolOnlyTorrent = $this->torrent->unhybridized(TorrentFile::PROTOCOL_V1);
+            $v1ProtocolOnlyTorrent = $this->torrent->unhybridizedTo(TorrentFile::PROTOCOL_V1);
             $this->assertEquals(TorrentFile::PROTOCOL_V1, $v1ProtocolOnlyTorrent->getProtocol());
 
-            $v2ProtocolOnlyTorrent = $this->torrent->unhybridized(TorrentFile::PROTOCOL_V2);
+            $v2ProtocolOnlyTorrent = $this->torrent->unhybridizedTo(TorrentFile::PROTOCOL_V2);
             $this->assertEquals(TorrentFile::PROTOCOL_V2, $v2ProtocolOnlyTorrent->getProtocol());
 
             // The origin torrent's protocol is not change.
@@ -371,7 +371,7 @@ trait TorrentFileCommonTrait
             $this->expectException(ParseException::class);
             $this->expectExceptionMessage('Unknown unhybridized target.');
 
-            $this->torrent->unhybridized('unknown');
+            $this->torrent->unhybridizedTo('unknown');
         } else {
             $this->markTestSkipped();
         }
@@ -379,7 +379,7 @@ trait TorrentFileCommonTrait
 
     public function testUnhybridizedTorrentToSameProtocol()
     {
-        $unhybridizedTorrentWithSameProtocol = $this->torrent->unhybridized($this->protocol);
+        $unhybridizedTorrentWithSameProtocol = $this->torrent->unhybridizedTo($this->protocol);
         $this->assertEquals($this->protocol, $unhybridizedTorrentWithSameProtocol->getProtocol());
     }
 
@@ -389,7 +389,7 @@ trait TorrentFileCommonTrait
             // Conversion between v1-only and v2-only torrents is not allowed
             $this->expectException(ParseException::class);
             $this->expectExceptionMessage('Unable to unhybridized, this torrent is ');
-            $this->torrent->unhybridized($this->protocol == TorrentFile::PROTOCOL_V1 ? TorrentFile::PROTOCOL_V2 : TorrentFile::PROTOCOL_V1);
+            $this->torrent->unhybridizedTo($this->protocol == TorrentFile::PROTOCOL_V1 ? TorrentFile::PROTOCOL_V2 : TorrentFile::PROTOCOL_V1);
         } else {
             $this->markTestSkipped();
         }
@@ -401,7 +401,7 @@ trait TorrentFileCommonTrait
             // v1-only and v2-only torrents can't upgrade to hybrid torrent
             $this->expectException(ParseException::class);
             $this->expectExceptionMessage('Unable to unhybridized, this torrent is ');
-            $this->torrent->unhybridized(TorrentFile::PROTOCOL_HYBRID);
+            $this->torrent->unhybridizedTo(TorrentFile::PROTOCOL_HYBRID);
         } else {
             $this->markTestSkipped();
         }

@@ -239,8 +239,8 @@ $fileTree = $torrent->getFileTree(?$sortType = TorrentFile::FILETREE_SORT_NORMAL
  * 
  * @since v2.5.0
  */
-$v1ProtocolOnlyTorrent = $hybridTorrent->unhybridized(TorrentFile::PROTOCOL_V1);
-$v2ProtocolOnlyTorrent = $hybridTorrent->unhybridized(TorrentFile::PROTOCOL_V2);
+$v1ProtocolOnlyTorrent = $hybridTorrent->unhybridizedTo(TorrentFile::PROTOCOL_V1);
+$v2ProtocolOnlyTorrent = $hybridTorrent->unhybridizedTo(TorrentFile::PROTOCOL_V2);
 
 // 7. Other method
 $torrent->cleanCache();

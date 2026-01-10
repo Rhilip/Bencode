@@ -811,7 +811,7 @@ class TorrentFile
      * @throws ParseException If the current torrent is not hybrid or an unknown `$targetVersion` is provided.
      * @since v2.5.0
      */
-    public function unhybridized($targetProtocol = self::PROTOCOL_V1)
+    public function unhybridizedTo($targetProtocol = self::PROTOCOL_V1)
     {
         $currentProtocol = $this->getProtocol();
         if ($currentProtocol !== self::PROTOCOL_HYBRID && $currentProtocol !== $targetProtocol) {
