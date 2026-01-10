@@ -806,29 +806,29 @@ class TorrentFile
      *  when the target is `TorrentFile::PROTOCOL_V1`, v2 fields are removed;
      *  when the target is `TorrentFile::PROTOCOL_V2`, v1 fields are removed.
      *
-     * @param string $targetVersion Target protocol version, use class constants `TorrentFile::PROTOCOL_V1`
+     * @param string $targetProtocol Target protocol version, use class constants `TorrentFile::PROTOCOL_V1`
      *                              or `TorrentFile::PROTOCOL_V2`. Defaults to `TorrentFile::PROTOCOL_V1`.
      * @return TorrentFile The cloned `TorrentFile` instance converted to the target version.
      * @throws ParseException If the current torrent is not hybrid or an unknown `$targetVersion` is provided.
      */
-    public function unhybridized($targetVersion = self::PROTOCOL_V1)
+    public function unhybridized($targetProtocol = self::PROTOCOL_V1)
     {
         $currentProtocol = $this->getProtocol();
-        if ($currentProtocol !== self::PROTOCOL_HYBRID && $currentProtocol !== $targetVersion) {
-            throw new ParseException("Unable to unhybridized, this torrent is {$currentProtocol}-only and can't convert to {$targetVersion}.");
+        if ($currentProtocol !== self::PROTOCOL_HYBRID && $currentProtocol !== $targetProtocol) {
+            throw new ParseException("Unable to unhybridized, this torrent is {$currentProtocol}-only and can't convert to {$targetProtocol}.");
         }
 
         $unhybridizedTorrent = clone $this;
         unset($unhybridizedTorrent->cache['protocol']);  // clean protocol cache if exist
-        if ($targetVersion == self::PROTOCOL_HYBRID) {
+        if ($targetProtocol == self::PROTOCOL_HYBRID) {
             // Nothing need to do when hybrid torrent unhybridized to hybrid
-        } elseif ($targetVersion == self::PROTOCOL_V1) {
+        } elseif ($targetProtocol == self::PROTOCOL_V1) {
             // Remove Bittorrent v2 field
             $unhybridizedTorrent
                 ->unsetRootField('piece layers')
                 ->unsetInfoField('meta version')
                 ->unsetInfoField('file tree');
-        } elseif ($targetVersion == self::PROTOCOL_V2) {
+        } elseif ($targetProtocol == self::PROTOCOL_V2) {
             // Remove Bittorrent v1 field
             $unhybridizedTorrent
                 ->unsetInfoField('pieces')
