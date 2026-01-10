@@ -769,8 +769,9 @@ class TorrentFile
      *    ]
      * ]
      *
-     * > Add in v2.4.0
-     * You can now pass argument to control the fileTree sort type. By default, this argument is TorrentFile::FILETREE_SORT_NORMAL.
+     * @since v2.4.0 You can now pass argument to control the fileTree sort type.
+     *               By default, this argument is TorrentFile::FILETREE_SORT_NORMAL.
+     *
      * Control Const (see different in `tests/TorrentFileTreeSortTest.php` file):
      *  - TorrentFile::FILETREE_SORT_NORMAL : not sort, also means sort by torrent file parsed order
      *  - TorrentFile::FILETREE_SORT_STRING : sort by filename ASC ("natural ordering" and "case-insensitively")
@@ -795,8 +796,6 @@ class TorrentFile
     }
 
     /**
-     * > Add in v2.5.0
-     *
      * Create an unhybridized copy of a hybrid torrent for the specified single protocol version
      * (does not modify the original instance).
      *
@@ -807,9 +806,10 @@ class TorrentFile
      *  when the target is `TorrentFile::PROTOCOL_V2`, v1 fields are removed.
      *
      * @param string $targetProtocol Target protocol version, use class constants `TorrentFile::PROTOCOL_V1`
-     *                              or `TorrentFile::PROTOCOL_V2`. Defaults to `TorrentFile::PROTOCOL_V1`.
+     *                               or `TorrentFile::PROTOCOL_V2`. Defaults to `TorrentFile::PROTOCOL_V1`.
      * @return TorrentFile The cloned `TorrentFile` instance converted to the target version.
      * @throws ParseException If the current torrent is not hybrid or an unknown `$targetVersion` is provided.
+     * @since v2.5.0
      */
     public function unhybridized($targetProtocol = self::PROTOCOL_V1)
     {

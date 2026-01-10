@@ -214,8 +214,9 @@ $fileList = $torrent->getFileList();
  *    ]
  * ]
  *
- * > Add in v2.4.0
- * You can now pass argument to control the fileTree sort type. By default, this argument is TorrentFile::FILETREE_SORT_NORMAL.
+ * @since v2.4.0 You can now pass argument to control the fileTree sort type. 
+ *               By default, this argument is TorrentFile::FILETREE_SORT_NORMAL.
+ * 
  * Control Const (see different in `tests/TorrentFileTreeSortTest.php` file):
  *  - TorrentFile::FILETREE_SORT_NORMAL : not sort, also means sort by torrent file parsed order 
  *  - TorrentFile::FILETREE_SORT_STRING : sort by filename ASC ("natural ordering" and "case-insensitively")
@@ -227,8 +228,6 @@ $fileTree = $torrent->getFileTree(?$sortType = TorrentFile::FILETREE_SORT_NORMAL
 
 // 6. unhybridized
 /**
- * > Add in v2.5.0
- *
  * Create an unhybridized copy of a hybrid torrent for the specified single protocol version
  * (does not modify the original instance).
  *
@@ -237,6 +236,8 @@ $fileTree = $torrent->getFileTree(?$sortType = TorrentFile::FILETREE_SORT_NORMAL
  * For example:
  *  when the target is `TorrentFile::PROTOCOL_V1`, v2 fields are removed;
  *  when the target is `TorrentFile::PROTOCOL_V2`, v1 fields are removed.
+ * 
+ * @since v2.5.0
  */
 $v1ProtocolOnlyTorrent = $hybridTorrent->unhybridized(TorrentFile::PROTOCOL_V1);
 $v2ProtocolOnlyTorrent = $hybridTorrent->unhybridized(TorrentFile::PROTOCOL_V2);
