@@ -128,7 +128,7 @@ class Bencode
      */
     private static function checkInteger($value)
     {
-        $int = (int)$value;
+        $int = @intval($value); // silence the notice when number is overflow in PHP > 8.5
         if ((string)$int !== $value) {
             throw new ParseException('Invalid integer format or integer overflow: ' . $value);
         }
