@@ -365,13 +365,18 @@ class TorrentFile
             } else {
                 $fileTree = $this->getInfoField('file tree');
 
+                // Check root of file tree first
                 if (\count($fileTree) !== 1) {
                     $this->cache['filemode'] = self::FILEMODE_MULTI;
                 } else {
+                    // the file tree only has one leaf, lets check first file
                     $file = reset($fileTree);
 
+                    // oh, this leaf is file, so this torrent should be single file mode
                     if (isset($file['']['length'])) {
                         $this->cache['filemode'] = self::FILEMODE_SINGLE;
+                    } else {
+                        $this->cache['filemode'] = self::FILEMODE_MULTI;
                     }
                 }
             }

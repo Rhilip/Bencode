@@ -18,4 +18,27 @@ class TorrentV2MultiTest extends TestCase
         TorrentFile::PROTOCOL_V1 => null,
         TorrentFile::PROTOCOL_V2 => '832d96b4f8b422aa75f8d40975b1a408154bc1a2bdffccf7b689386cde125a30'
     ];
+
+    public function testFileModeShouldBeMultiWhenTopIsDir() {
+        $clone_torrent = clone $this->torrent;
+        $clone_torrent->cleanCache();
+        $clone_torrent->setInfoField('file tree', [
+            'folder' => [
+                'file1.dat' => [
+                    '' => [
+                        'length' => 123456,
+                        'pieces root' => hex2bin('832d96b4f8b422aa75f8d40975b1a408154bc1a2bdffccf7b689386cde125a30')
+                    ]
+                ],
+                'file2.dat' => [
+                    '' => [
+                        'length' => 123456,
+                        'pieces root' => hex2bin('832d96b4f8b422aa75f8d40975b1a408154bc1a2bdffccf7b689386cde125a30')
+                    ]
+                ],
+            ]
+        ]);
+
+        $this->assertEquals(TorrentFile::FILEMODE_MULTI, $clone_torrent->getFileMode());
+    }
 }
