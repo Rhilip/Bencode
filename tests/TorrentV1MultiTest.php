@@ -79,4 +79,54 @@ class TorrentV1MultiTest extends TestCase
 
         $this->torrent->parse();
     }
+
+    /**
+     * Multi-file format
+     * [
+     *   'info' => [
+     *     'files' => [
+     *       [ 'attr' => "phxl", 'length' => 123456, 'path' => ['dir1', 'file1'] ],
+     *     ]
+     *   ]
+     * ]
+     */
+    public function testExtendFileAttr() {
+        $clone_torrent = clone $this->torrent;
+
+        $filesField = $clone_torrent->getInfoField('files');
+        $filesField[0]['attr'] = 'hx';
+        $clone_torrent->setInfoField('files', $filesField);
+
+        $clone_torrent->cleanCache()->parse();
+
+        $torrentFileList = $clone_torrent->getFileList();
+        $this->assertEquals('hx', $torrentFileList[0]['attr']);
+    }
+
+    public function testLAttrMustHasSymlinkFile() {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Checking Dictionary missing key: symlink path');
+
+        $clone_torrent = clone $this->torrent;
+
+        $filesField = $clone_torrent->getInfoField('files');
+        $filesField[0]['attr'] = 'l';
+        $clone_torrent->setInfoField('files', $filesField);
+
+        $clone_torrent->cleanCache()->parse();
+    }
+
+    public function testSymlinkFileMustZeroLength() {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Invalid symlink file, must be 0 length');
+
+        $clone_torrent = clone $this->torrent;
+
+        $filesField = $clone_torrent->getInfoField('files');
+        $filesField[0]['attr'] = 'l';
+        $filesField[0]['symlink path'] = ['dir1', 'name.ext'];
+        $clone_torrent->setInfoField('files', $filesField);
+
+        $clone_torrent->cleanCache()->parse();
+    }
 }

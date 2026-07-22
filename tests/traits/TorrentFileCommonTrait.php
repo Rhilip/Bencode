@@ -107,9 +107,14 @@ trait TorrentFileCommonTrait
         $this->assertEquals($this->protocol, $this->torrent->getProtocol());
     }
 
-    public function testgetFileMode()
+    public function testGetFileMode()
     {
         $this->assertEquals($this->fileMode, $this->torrent->getFileMode());
+    }
+
+    public function testIsDirectory()
+    {
+        $this->assertEquals($this->fileMode === TorrentFile::FILEMODE_MULTI, $this->torrent->isDirectory());
     }
 
     public function testInfoHash()

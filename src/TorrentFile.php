@@ -386,6 +386,17 @@ class TorrentFile
     }
 
     /**
+     * A method to check if a directory or a file is encoded.
+     *
+     * @since v2.5.5
+     * @return bool
+     */
+    public function isDirectory()
+    {
+        return $this->getFileMode() === self::FILEMODE_MULTI;
+    }
+
+    /**
      * Get V1 info hash if V1 metadata is present or null if not.
      *
      * note:
@@ -584,20 +595,37 @@ class TorrentFile
      * 6. other method that we used to get size, filelist or filetree,
      *
      */
-    protected function addFileToList($paths, $size)
+    protected function addFileToList($paths, $size, $raw)
     {
         if ($this->useParseValidator) {
             call_user_func($this->parseValidator, array_last($paths), $paths);
         }
-        $this->cache['files'][] = ['path' => implode('/', $paths), 'size' => $size];
+
+        $file = ['path' => implode('/', $paths), 'size' => $size];
+
+        if (isset($raw['attr'])) {
+            $file['attr'] = $raw['attr'];
+
+            // check for symlink attr
+            if (str_contains($file['attr'], 'l')) {
+                $symlink_path = self::checkTorrentDict($raw, 'symlink path', 'array');
+                $file['symlink path'] = implode('/', $symlink_path);
+                // for symlink file, it's size must be zero
+                if ($size !== 0) {
+                    throw new ParseException('Invalid symlink file, must be 0 length');
+                }
+            }
+        }
+
+        $this->cache['files'][] = $file;
     }
 
     protected function parseV1SingleTorrent()
     {
-        $size = $this->getInfoField('length');
+        $size = self::checkTorrentDict($this->data['info'], 'length', 'integer');
         $name = $this->getName();
 
-        $this->addFileToList([$name], $size);
+        $this->addFileToList([$name], $size, $this->getInfoData());
         $this->cache['fileTree'][$name] = $size;
     }
 
@@ -616,7 +644,7 @@ class TorrentFile
                 }
             }
 
-            $this->addFileToList($paths, $length);
+            $this->addFileToList($paths, $length, $file);
 
             // Built fileTree for v1-multi torrent
             $leafPart = array_pop($paths);
@@ -638,6 +666,10 @@ class TorrentFile
     private function loopMerkleTree(&$merkleTree, &$paths = [])
     {
         if (isset($merkleTree[''])) {  // reach file
+            if (count($merkleTree) > 1) {
+                throw new ParseException('Invalid node: file cannot contain child files');
+            }
+
             $file = $merkleTree[''];
 
             $piecesRoot = self::checkTorrentDict($file, 'pieces root', 'string');
@@ -652,7 +684,7 @@ class TorrentFile
                 }
             }
 
-            $this->addFileToList($paths, $length);
+            $this->addFileToList($paths, $length, $file);
             $merkleTree = $length;  // rewrite merkleTree to size, it's safe since it not affect $data['info']['file tree']
         } else {
             $parent_path = $paths;  // store parent paths
@@ -713,6 +745,15 @@ class TorrentFile
      * [
      *   ["path" => "filename1", "size" => 123],   //  123 is file size
      *   ["path" => "directory/filename2", "size" => 2345]
+     * ]
+     *
+     * @since  v2.5.5, extended file attributes (BEP47) will parse into `attr` field if exist,
+     *                 and symlink path will be in `symlink path` field with string format if file is symlink
+     * for example,
+     * [
+     *   ["path" => "filename1", "size" => 123],
+     *   ["path" => "filename2", "size" => 123, "attr" => "phx"],
+     *   ["path" => "filename3", "size" => 0, "attr" => "l", "symlink path" => "dir1/target.ext"],
      * ]
      *
      */

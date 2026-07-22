@@ -139,6 +139,11 @@ $protocol = $torrent->getProtocol();  // TorrentFile::PROTOCOL_{V1,V2,HYBRID}
 $fileMode = $torrent->getFileMode();  // TorrentFile::FILEMODE_{SINGLE,MULTI}
 
 /**
+ * @since v2.5.5, you can use isDirectory() method to quick check if the torrent is a directory or not.
+ */
+$isDirectory = $torrent->isDirectory();
+
+/**
  * @note since we may edit $root['info'], so when call ->getInfoHash* method, 
  *       we will calculate it each call without cache return-value. 
  */
@@ -199,7 +204,16 @@ $count = $torrent->getFileCount();
  *   ["path" => "filename1", "size" => 123],   //  123 is file size
  *   ["path" => "directory/filename2", "size" => 2345]
  * ]
- *
+ * 
+ * @since v2.5.5, extended file attributes (BEP47) will parse into `attr` field if exist,
+ *                and symlink path will be in `symlink path` field with string format if file is symlink
+ * 
+ * for example,
+ * [
+ *   ["path" => "filename1", "size" => 123, "attr" => ""],
+ *   ["path" => "filename2", "size" => 123, "attr" => "phx"],
+ *   ["path" => "filename3", "size" => 0, "attr" => "l", "symlink path" => "dir1/target.ext"],
+ * ]
  */
 $fileList = $torrent->getFileList();
 

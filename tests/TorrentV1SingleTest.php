@@ -18,4 +18,22 @@ class TorrentV1SingleTest extends TestCase
         TorrentFile::PROTOCOL_V1 => 'd0e710431bed8cb4b1860b9a7a40a20df8de8266',
         TorrentFile::PROTOCOL_V2 => null
     ];
+
+    /**
+     * Single-file format
+     * [
+     *   'info' => [
+     *     'attr' => 'hx',
+     *     'sha1' => <20 bytes>,
+     *   ]
+     * ]
+     */
+    public function testExtendFileAttr() {
+        $clone_torrent = clone $this->torrent;
+        $clone_torrent->setInfoField('attr', 'hx');
+        $clone_torrent->cleanCache()->parse();
+
+        $torrentFileList = $clone_torrent->getFileList();
+        $this->assertEquals('hx', $torrentFileList[0]['attr']);
+    }
 }
