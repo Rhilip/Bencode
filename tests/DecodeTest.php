@@ -184,6 +184,40 @@ class DecodeTest extends TestCase
     /**
      * @group string
      */
+    public function testDecodeStringMissingColonInList()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Missing colon after string length');
+
+        // used to loop forever (until memory ran out) appending empty strings
+        Bencode::decode('l0a');
+    }
+
+    /**
+     * @group string
+     */
+    public function testDecodeStringMissingColon()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Missing colon after string length');
+
+        Bencode::decode('d3:key0');
+    }
+
+    /**
+     * @group integer
+     */
+    public function testDecodeIntegerUnterminated()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unterminated bencode integer');
+
+        Bencode::decode('li12');
+    }
+
+    /**
+     * @group string
+     */
     public function testDecodeStringUnexpectedEof()
     {
         $this->expectException(ParseException::class);
@@ -256,7 +290,7 @@ class DecodeTest extends TestCase
     public function testDecodeDictionaryWithKeyButWithoutValue()
     {
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Invalid integer format or integer overflow');  // FIXME
+        $this->expectExceptionMessage('Dictionary key without value: b');
         Bencode::decode('d1:ai1e1:be');
     }
 

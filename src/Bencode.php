@@ -68,6 +68,9 @@ class Bencode
             $return = [];
             while ($data[$pos] !== 'e') {
                 $key = self::decode($data, $pos);
+                if ($pos < strlen($data) && $data[$pos] === 'e') {
+                    throw new ParseException('Dictionary key without value: ' . $key);
+                }
                 $value = self::decode($data, $pos);
                 if ($key === null || $value === null) {
                     break;
@@ -91,12 +94,20 @@ class Bencode
             $pos++;
         } elseif ($data[$pos] === 'i') {
             $pos++;
-            $digits = strpos($data, 'e', $pos) - $pos;
+            $end = strpos($data, 'e', $pos);
+            if ($end === false) {
+                throw new ParseException('Unterminated bencode integer');
+            }
+            $digits = $end - $pos;
             $value = substr($data, $pos, $digits);
             $return = self::checkInteger($value);
             $pos += $digits + 1;
         } else {
-            $digits = strpos($data, ':', $pos) - $pos;
+            $colon = strpos($data, ':', $pos);
+            if ($colon === false) {
+                throw new ParseException('Missing colon after string length');
+            }
+            $digits = $colon - $pos;
             $len = self::checkInteger(substr($data, $pos, $digits));
             if ($len < 0) {
                 throw new ParseException('Cannot have non-digit values for String length');
