@@ -216,6 +216,33 @@ class DecodeTest extends TestCase
     }
 
     /**
+     * A list or dictionary without the closing 'e' should throw ParseException,
+     * not read past the end of the input and raise a PHP warning.
+     *
+     * @group list
+     * @group dictionary
+     * @dataProvider unterminatedListOrDictionaryProvider
+     */
+    public function testDecodeListOrDictionaryUnterminated($data)
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unterminated bencode string literal');
+
+        Bencode::decode($data);
+    }
+
+    public function unterminatedListOrDictionaryProvider()
+    {
+        return [
+            ['l'],
+            ['li1e'],
+            ['lle'],
+            ['d'],
+            ['d1:ai1e'],
+        ];
+    }
+
+    /**
      * @group string
      */
     public function testDecodeStringUnexpectedEof()
