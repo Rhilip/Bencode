@@ -66,7 +66,7 @@ class Bencode
         if ($data[$pos] === 'd') {
             $pos++;
             $return = [];
-            while ($data[$pos] !== 'e') {
+            while (($data[$pos] ?? '') !== 'e') {
                 $key = self::decode($data, $pos);
                 if ($pos < strlen($data) && $data[$pos] === 'e') {
                     throw new ParseException('Dictionary key without value: ' . $key);
@@ -87,7 +87,7 @@ class Bencode
         } elseif ($data[$pos] === 'l') {
             $pos++;
             $return = [];
-            while ($data[$pos] !== 'e') {
+            while (($data[$pos] ?? '') !== 'e') {
                 $value = self::decode($data, $pos);
                 $return[] = $value;
             }
